@@ -1,0 +1,124 @@
+<html>
+	<head>
+		<title>Tempy!</title>
+		<link rel="stylesheet" href="/style.css" />
+	</head>
+	<script type="text/javascript" src="http://yotta.tln/js/jquery.js"></script>
+		<script type="text/javascript">
+			console.log("Javascript started executing "+new Date());
+			
+								
+								
+			// get the list of available sensors
+			// then for each sensor fire a callback to populate the #sensors list
+			function show_sensors(){
+			console.log("show_sensors() called "+new Date());
+			var temperature_callbacks = $.Callbacks();
+			temperature_callbacks.add(get_temperature);
+				
+				$.get("http://tempy.tln/sensors", function(data){
+						console.log("Callback code executing, Got data from api "+new Date());
+						var sensors = "<ul id=\"sensors_list\"></ul>";
+						for ( sensor in data.sensors_list){
+							var sensor_temp = "not yet here";
+							temperature_callbacks.fire(data.sensors_list[sensor]);
+						}
+						$("#sensors").html(sensors);
+						console.log("Ul has been drawn "+new Date());
+
+						console.log("Callback code finished executing "+new Date());
+					});
+				console.log("show_sensors() ended "+new Date());
+			}
+			
+			var get_temperature = function(test_value){
+				console.log("get_temperature() started "+new Date());
+
+				$.get("http://tempy.tln/get/"+test_value+"/last", function(sensor_temp){
+							console.log("/get/ -> Callback for "+sensor_temp.sensor);
+							console.log(sensor_temp.temperature);
+							console.log(sensor_temp.source);
+							$("ul#sensors_list").append("<li><div class='temperature'>"+sensor_temp.temperature+"</div>"+sensor_temp.sensor+"</li>");
+							});
+				console.log("get_temperature() ended "+new Date());
+			}	
+			function item_count(){
+					$("#count").show();
+					$("#count").html("getting item count, please stand by...");
+					$.get("http://tempy.tln/count", function(data){
+						item_count = "Current item count:"+data.item_count;
+						$("#count").html(item_count);
+
+					});
+				
+				//$("#show").click(function(){
+				//	$(".this").show();
+				//});
+			}
+			
+			function update_tile(name){
+				$("#"+name).html("Updating..."+name);
+				$.get("http://tempy.tln/get/"+name+"/last", function(sensor_temp){
+					console.log("/get/ -> Callback for "+sensor_temp.sensor);
+					console.log(sensor_temp.temperature);
+					console.log(sensor_temp.source);
+					$("#"+name).html("<div class='temperature'>"+sensor_temp.temperature+"</div>"+sensor_temp.sensor);
+					if(sensor_temp.humidity){
+						console.log("Also updating humidity"+new Date());
+						var humidity_html ="";
+						humidity_html = humidity_html + "<div class='temperature'>";
+						humidity_html = humidity_html + sensor_temp.humidity;
+						humidity_html = humidity_html + "</div>";
+						humidity_html = humidity_html + "Humidity";
+						$("#humidity").html(humidity_html);
+					}
+				});
+			}
+			
+			function refresh_tiles(){
+				update_tile("ilmerree_temperature");
+				update_tile("forecastio_temperature");
+				update_tile("wipi-int");
+			}				
+			$(document).ready(function(){
+				console.log("document ready callback started "+new Date());
+				//defaults
+				$("#count").hide();
+				//$(".this").html("Whoa, this got changed by javascript");
+				$("#get_count_button").click(function(){
+					item_count();
+				});
+				// Refresh button
+				$("#refresh").click(function(){
+					console.log("refresh callback started "+new Date());
+					refresh_tiles();
+					console.log("refresh callback ended "+new Date());
+					
+			});
+			
+			refresh_tiles();
+			
+			console.log("document ready callback ended "+new Date());
+			});
+			console.log("End of javascript"+new Date());
+		</script>
+	<body>
+		
+		<h1>Welcome to Tempy!</h1>
+		
+		<div id="data">
+			<table>
+				<tr><td class="inout">Out:</td><td class="temptile" id="ilmerree_temperature">ILM err</td><td class="temptile" id="forecastio_temperature">ForecastIO</td></tr>
+				<tr><td class="inout">In:</td><td class="temptile" id="wipi-int">Inside</td><td class="temptile" id="humidity"></td></tr>
+			</table>
+			<div id="count">Current item count: unknown</div>
+
+		</div>
+
+		<div id="buttons">
+			<button id="get_count_button">Get count</button>
+			<button id="refresh">Refresh</button>
+		</div>
+		
+	</body>
+</html>

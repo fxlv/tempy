@@ -1,0 +1,33 @@
+button {
+	color: red;
+	border: 1px solid red;
+	padding: 2px;
+}
+
+#data {
+	max-width: 600px;
+	border: 1px solid lightgray;
+	padding: 5px;
+}
+
+.temptile {
+	background-color: #B5F36D;
+	padding:10px;
+	margin:2px;
+	height:100px;
+	display: table-cell;
+	min-width: 100px;
+	min-height: 100px;
+	border:1px solid #519600;
+	
+}
+
+.temperature {
+	font-size: 4em;
+}
+
+.inout {
+	font-size: 5em;
+}
+
+
