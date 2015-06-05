@@ -1,3 +1,5 @@
+#let's not share the creds
+creds.js
 # Logs
 logs
 *.log
