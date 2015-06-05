@@ -1,9 +1,22 @@
 // dependencies
-var express = require("express");
-var bodyParser = require("body-parser");
-var mongoose = require("mongoose");
+try {
+	var express = require("express");
+	var bodyParser = require("body-parser");
+	var mongoose = require("mongoose");
+} catch (err){
+	console.error("Failed loading one of the dependencies");
+	console.error("Please make sure you have ran 'npm install'");
+	console.error("See the following message for more details:");
+	console.error(err);
+}
+
 var Temperature = require("./temperature");
-var creds = require("./creds");
+try {
+	var creds = require("./creds");
+} catch (err){
+	console.error("Credentials missing");
+	console.error("Please provide 'creds.js' file. See documentation for details.");
+}
 // setting up the app
 var app = express();
 app.use(bodyParser.json());
