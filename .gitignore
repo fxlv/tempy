@@ -1,3 +1,5 @@
+push-dev.sh
+*.swp
 #let's not share the creds
 creds.js
 # Logs
