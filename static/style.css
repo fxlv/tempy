@@ -2,10 +2,11 @@ button {
 	color: red;
 	border: 1px solid red;
 	padding: 2px;
+    background-color: #FFEFD5;
 }
 
 #data {
-	max-width: 600px;
+	max-width: 900px;
 	border: 1px solid lightgray;
 	padding: 5px;
 }
@@ -23,7 +24,12 @@ button {
 }
 
 .temperature {
+    color: #218C8D;
 	font-size: 4em;
+}
+.wind_direction {
+    color: #218C8D;
+	font-size: 3em;
 }
 
 .inout {

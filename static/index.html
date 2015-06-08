@@ -72,6 +72,24 @@
 						humidity_html = humidity_html + "Humidity";
 						$("#humidity").html(humidity_html);
 					}
+					if(sensor_temp.wind_speed){
+						console.log("Also updating wind speed"+new Date());
+						var wind_speed_html ="";
+						wind_speed_html = wind_speed_html + "<div class='temperature'>";
+						wind_speed_html = wind_speed_html + sensor_temp.wind_speed;
+						wind_speed_html = wind_speed_html + "</div>";
+						wind_speed_html = wind_speed_html + "Wind speed (m/s)";
+						$("#wind_speed").html(wind_speed_html);
+					}
+					if(sensor_temp.wind_direction){
+						console.log("Also updating wind direction"+new Date());
+						var wind_direction_html ="";
+						wind_direction_html = wind_direction_html + "<div class='wind_direction'>";
+						wind_direction_html = wind_direction_html + sensor_temp.wind_direction;
+						wind_direction_html = wind_direction_html + "</div>";
+						wind_direction_html = wind_direction_html + "Wind direction";
+						$("#wind_direction").html(wind_direction_html);
+					}
 				});
 			}
 			
@@ -108,8 +126,16 @@
 		
 		<div id="data">
 			<table>
-				<tr><td class="inout">Out:</td><td class="temptile" id="ilmerree_temperature">ILM err</td><td class="temptile" id="forecastio_temperature">ForecastIO</td></tr>
-				<tr><td class="inout">In:</td><td class="temptile" id="wipi-int">Inside</td><td class="temptile" id="humidity"></td></tr>
+                <tr>
+                    <td class="inout">Out:</td>
+                    <td class="temptile" id="ilmerree_temperature">ILM err</td>
+                    <td class="temptile" id="forecastio_temperature">ForecastIO</td>
+                    <td class="temptile" id="wind_speed"></td>
+                    <td class="temptile" id="wind_direction"></td>
+                </tr>
+				<tr><td class="inout">In:</td><td class="temptile" id="wipi-int">Inside</td>
+                    <td class="temptile" id="humidity"></td>
+                </tr>
 			</table>
 			<div id="count">Current item count: unknown</div>
 
