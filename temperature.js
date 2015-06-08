@@ -7,7 +7,8 @@ var temperatureSchema = new Schema({
 	sensor: String,
 	temperature: String,
 	humidity: String,
-	wind: String,
+	wind_speed: String,
+	wind_direction: String,
 	pressure: String,
 	created: Date
 });

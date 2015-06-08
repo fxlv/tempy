@@ -104,11 +104,17 @@ app.post("/add", function(req, res){
 	console.log(req.body);
 	var humidity = "";
 	var pressure = "";
-	var wind = "";
-	
+	var wind_speed = "";
+	var wind_direction = "";
 	if(req.body.source && req.body.sensor && req.body.temperature){
 		if(req.body.humidity){
 			humidity = req.body.humidity;
+		}
+		if(req.body.wind_speed){
+			wind_speed = req.body.wind_speed;
+		}
+		if(req.body.wind_direction){
+			wind_direction = req.body.wind_direction;
 		}
 		console.log("Got all the required data, ready for insert.");
 		var temp = new Temperature({
@@ -116,7 +122,8 @@ app.post("/add", function(req, res){
 			sensor: req.body.sensor,
 			humidity: humidity,
 			pressure: pressure,
-			wind: wind,
+			wind_speed: wind_speed,
+			wind_direction: wind_direction,
 			temperature: req.body.temperature,
 			created: new Date()
 		});
