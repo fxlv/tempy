@@ -137,11 +137,23 @@ public class Body
 #endregion
 
         static async void GetTemp(){
+            string response = "";
             HttpClient client = new HttpClient();
             string netatmoaccess_token = "__YOUR NETATMO TOKEN HERE__";
             UriBuilder uri = new UriBuilder("https://api.netatmo.com/api/getstationsdata");
             uri.Query = $"access_token={netatmoaccess_token}";
-            var response  = client.GetStringAsync(uri.Uri).Result;
+            try {
+                response  = client.GetStringAsync(uri.Uri).Result;
+            } catch (Exception e){
+                if(e.InnerException.Message.Contains("Forbidden")){
+                    Console.WriteLine("You are using invalid token");
+                } else {
+                    Console.WriteLine("Unexpected exception while sending request to Netatmo API");
+                    Console.WriteLine(e.InnerException.Message);
+                }
+                Environment.Exit(1);
+            }
+
             var jsonObject = JsonConvert.DeserializeObject<JObject>(response);
             var dataResult = jsonObject["body"].ToString();
             var cityData = JsonConvert.DeserializeObject<JObject>(dataResult);
