@@ -1,0 +1,6 @@
+{
+    "client_id": "your client id here",
+    "client_secret": "client secret here",
+    "username": "netatmo user name",
+    "password": "netatmo password"
+  }
