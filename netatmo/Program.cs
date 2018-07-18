@@ -3,18 +3,25 @@ using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.IO;
 using Newtonsoft.Json;
-
+using RestSharp;
+using RestSharp.Authenticators;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Configuration.FileExtensions;
 
  namespace netatmo
 {
    
     class Program
     {
+            public static IConfiguration Configuration { get; set; }
+
         static void Main(string[] args)
         {
-            GetTemp();
+            DoAuth();
+            //GetTemp();
         }
 
 public class DefaultAlarm
@@ -136,6 +143,27 @@ public class Body
 
 #endregion
 
+        static async void DoAuth(){
+
+             var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json");
+
+        Configuration = builder.Build();
+
+
+            var client = new RestClient("https://api.netatmo.com");
+            client.Authenticator = new HttpBasicAuthenticator(Configuration["client_id"], Configuration["client_secret"]);
+            var request = new RestRequest("oauth2/token", Method.POST);
+            request.AddParameter("grant_type", "password");
+            request.AddParameter("username", Configuration["username"]);
+            request.AddParameter("password", Configuration["password"]);
+
+            Console.WriteLine();
+            IRestResponse response = client.Execute(request);
+            var content = response.Content; 
+            Console.WriteLine(content);
+        }
         static async void GetTemp(){
             string response = "";
             HttpClient client = new HttpClient();
