@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration.FileExtensions;
 
  namespace netatmo
 {
+
+   
    
     class Program
     {
@@ -144,12 +146,23 @@ public class Body
 #endregion
 
         static async void DoAuth(){
-
+            string settingsFile = "appsettings.json";
+            try {
              var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json");
+            .AddJsonFile(settingsFile);
 
         Configuration = builder.Build();
+            } catch (System.FormatException e){
+                Console.WriteLine($"Could not read '{settingsFile}'");
+                Environment.Exit(1);
+            } catch (System.IO.FileNotFoundException e){
+                Console.WriteLine($"Settings file '{settingsFile}' not found");
+                Environment.Exit(0);    
+            } catch (Exception e){
+                Console.WriteLine($"Unexpected exception {e}");
+                Environment.Exit(1);
+            }
 
 
             var client = new RestClient("https://api.netatmo.com");
@@ -164,6 +177,7 @@ public class Body
             var content = response.Content; 
             Console.WriteLine(content);
         }
+
         static async void GetTemp(){
             string response = "";
             HttpClient client = new HttpClient();
