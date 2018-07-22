@@ -14,93 +14,11 @@ using RestSharp.Authenticators;
 namespace netatmo {
 
     class Program {
-        public static IConfiguration Configuration { get; set; }
 
         static void Main (string[] args) {
-            var oauthResponse = LoadAuth ();
-            if (oauthResponse.isValid) {
-                Console.WriteLine ("Auth settings loaded from file");
-            } else {
-                oauthResponse = DoAuth ();
-                SaveAuth (oauthResponse);
-            }
-
-            GetTemp (oauthResponse.access_token);
-        }
-
-        static void SaveAuth (OauthResponseObject oauthObject) {
-            oauthObject.timestamp = new DateTimeOffset (DateTime.UtcNow).ToUnixTimeSeconds ();
-
-            var toWrite = JsonConvert.SerializeObject (oauthObject);
-            TextWriter writer = new StreamWriter ("authsettings.bin", false);
-            writer.Write (toWrite);
-            writer.Close ();
-        }
-
-        static OauthResponseObject LoadAuth () {
-            OauthResponseObject oauthObject = new OauthResponseObject ();
-            long timestampNow = new DateTimeOffset (DateTime.UtcNow).ToUnixTimeSeconds ();
-
-            TextReader reader = null;
-            try {
-                reader = new StreamReader ("authsettings.bin");
-                var contents = reader.ReadToEnd ();
-                oauthObject = JsonConvert.DeserializeObject<OauthResponseObject> (contents);
-                Console.WriteLine ($"Timestamp now: {timestampNow}, timestam from file: {oauthObject.timestamp}");
-                var timestampDelta = timestampNow - oauthObject.timestamp;
-                if (timestampDelta <= 10700) {
-                    Console.WriteLine ($"We seem to have a valid auth token. Delta is {timestampDelta} seconds");
-                    oauthObject.isValid = true;
-                } else {
-                    oauthObject.isValid = false;
-                }
-            } catch (System.IO.FileNotFoundException e) {
-                Console.WriteLine ("Auth file not found");
-            } catch (Exception e) {
-                Console.WriteLine ("Exception while Loading auth file:");
-                Console.WriteLine (e);
-
-            } finally {
-                if (reader != null) {
-                    reader.Close ();
-                }
-            }
-            return oauthObject;
-        }
-        static OauthResponseObject DoAuth () {
-            string settingsFile = "appsettings.json";
-            try {
-                var builder = new ConfigurationBuilder ()
-                    .SetBasePath (Directory.GetCurrentDirectory ())
-                    .AddJsonFile (settingsFile);
-
-                Configuration = builder.Build ();
-            } catch (System.FormatException e) {
-                Console.WriteLine ($"Could not read '{settingsFile}'");
-                Environment.Exit (1);
-            } catch (System.IO.FileNotFoundException e) {
-                Console.WriteLine ($"Settings file '{settingsFile}' not found");
-                Environment.Exit (0);
-            } catch (Exception e) {
-                Console.WriteLine ($"Unexpected exception {e}");
-                Environment.Exit (1);
-            }
-
-            var client = new RestClient ("https://api.netatmo.com");
-            client.Authenticator = new HttpBasicAuthenticator (Configuration["client_id"], Configuration["client_secret"]);
-            var request = new RestRequest ("oauth2/token", Method.POST);
-            request.AddParameter ("grant_type", "password");
-            request.AddParameter ("username", Configuration["username"]);
-            request.AddParameter ("password", Configuration["password"]);
-
-            Console.WriteLine ("Making the request to Netatmo API");
-            IRestResponse response = client.Execute (request);
-            var content = response.Content;
-            Console.WriteLine (content);
-            OauthResponseObject oauthResponse = JsonConvert.DeserializeObject<OauthResponseObject> (content);
-            Console.WriteLine (content);
-            return oauthResponse;
-
+           
+            NetatmoAuth netAuth = new NetatmoAuth();
+            GetTemp(netAuth.GetToken());
         }
 
         static async void GetTemp (string netatmoaccess_token) {
