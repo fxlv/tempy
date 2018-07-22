@@ -13,8 +13,10 @@ using RestSharp.Authenticators;
 
 namespace netatmo {
 
-    // Authentication class takes care of logging in to Netatmo
-    //  acquiring the Oauth token and saving it for re-use.
+    /// <summary>
+    /// Authentication class takes care of logging in to Netatmo
+    /// acquiring the Oauth token and saving it for re-use.
+    /// </summary>
     class NetatmoAuth {
 
         // TODO: move this to a separate Configuration class
@@ -23,7 +25,10 @@ namespace netatmo {
         private string access_token { get; set; }
 
         private OauthResponseObject oauthObject;
-
+        /// <summary>
+        /// Constructor takes care of the business logic of
+        /// loading the saved authentication state and doing a re-auth if necessary.
+        /// </summary>
         public NetatmoAuth () {
             oauthObject = new OauthResponseObject ();
             LoadAuth ();
@@ -43,7 +48,9 @@ namespace netatmo {
         public string GetToken () {
             return access_token;
         }
-
+        /// <summary>
+        /// Save authentication state to a file locally for later re-use.
+        /// </summary>
         private void SaveAuth () {
             oauthObject.timestamp = new DateTimeOffset (DateTime.UtcNow).ToUnixTimeSeconds ();
 
@@ -52,6 +59,9 @@ namespace netatmo {
             writer.Write (toWrite);
             writer.Close ();
         }
+        /// <summary>
+        /// Load authentication state from file.
+        /// </summary>
         public void LoadAuth () {
 
             if (File.Exists (authSettingsFileName)) {
@@ -85,7 +95,10 @@ namespace netatmo {
                 Console.WriteLine($"Auth settings file {authSettingsFileName} does not exist.");
             }
         }
-
+        /// <summary>
+        /// Do oAuth authentication using locally stored credentials
+        /// against Netatmo oAuth API
+        /// </summary>
         private void DoAuth () {
             string settingsFile = "appsettings.json";
             try {
