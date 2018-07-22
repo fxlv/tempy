@@ -19,20 +19,20 @@ namespace netatmo {
 
         // TODO: move this to a separate Configuration class
         public static IConfiguration Configuration { get; set; }
-
-        private string access_token {get; set; }
+        private string authSettingsFileName = "authsettings.bin";
+        private string access_token { get; set; }
 
         private OauthResponseObject oauthObject;
 
-        public NetatmoAuth(){
-            oauthObject = new OauthResponseObject ();   
+        public NetatmoAuth () {
+            oauthObject = new OauthResponseObject ();
             LoadAuth ();
             if (oauthObject.isValid) {
                 Console.WriteLine ("Auth settings loaded from file");
             } else {
-                Console.WriteLine("Loaded auth settings were not valid. Will re-authenticate.");
-                DoAuth();
-                SaveAuth();
+                Console.WriteLine ("Loaded auth settings were not valid. Will re-authenticate.");
+                DoAuth ();
+                SaveAuth ();
             }
             access_token = oauthObject.access_token;
 
@@ -40,7 +40,7 @@ namespace netatmo {
         /// <summary>
         /// Returns Netatmo auth token as string.
         /// </summary>
-        public string GetToken(){
+        public string GetToken () {
             return access_token;
         }
 
@@ -52,36 +52,40 @@ namespace netatmo {
             writer.Write (toWrite);
             writer.Close ();
         }
-        public OauthResponseObject LoadAuth () {
-          
-            long timestampNow = new DateTimeOffset (DateTime.UtcNow).ToUnixTimeSeconds ();
+        public void LoadAuth () {
 
-            TextReader reader = null;
-            try {
-                reader = new StreamReader ("authsettings.bin");
-                var contents = reader.ReadToEnd ();
-                oauthObject = JsonConvert.DeserializeObject<OauthResponseObject> (contents);
-                Console.WriteLine ($"Timestamp now: {timestampNow}, timestam from file: {oauthObject.timestamp}");
-                var timestampDelta = timestampNow - oauthObject.timestamp;
-                if (timestampDelta <= 10700) {
-                    Console.WriteLine ($"We seem to have a valid auth token. Delta is {timestampDelta} seconds");
-                    oauthObject.isValid = true;
-                } else {
-                    oauthObject.isValid = false;
-                }
-            } catch (System.IO.FileNotFoundException e) {
-                Console.WriteLine ("Auth file not found");
-            } catch (Exception e) {
-                Console.WriteLine ("Exception while Loading auth file:");
-                Console.WriteLine (e);
+            if (File.Exists (authSettingsFileName)) {
+                long timestampNow = new DateTimeOffset (DateTime.UtcNow).ToUnixTimeSeconds ();
 
-            } finally {
-                if (reader != null) {
-                    reader.Close ();
+                TextReader reader = null;
+                try {
+                    reader = new StreamReader (authSettingsFileName);
+                    var contents = reader.ReadToEnd ();
+                    oauthObject = JsonConvert.DeserializeObject<OauthResponseObject> (contents);
+                    Console.WriteLine ($"Timestamp now: {timestampNow}, timestam from file: {oauthObject.timestamp}");
+                    var timestampDelta = timestampNow - oauthObject.timestamp;
+                    if (timestampDelta <= 10700) {
+                        Console.WriteLine ($"We seem to have a valid auth token. Delta is {timestampDelta} seconds");
+                        oauthObject.isValid = true;
+                    } else {
+                        oauthObject.isValid = false;
+                    }
+                } catch (System.IO.FileNotFoundException e) {
+                    Console.WriteLine ("Auth file not found");
+                } catch (Exception e) {
+                    Console.WriteLine ("Exception while Loading auth file:");
+                    Console.WriteLine (e);
+
+                } finally {
+                    if (reader != null) {
+                        reader.Close ();
+                    }
                 }
+            } else {
+                Console.WriteLine($"Auth settings file {authSettingsFileName} does not exist.");
             }
-            return oauthObject;
         }
+
         private void DoAuth () {
             string settingsFile = "appsettings.json";
             try {
