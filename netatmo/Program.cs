@@ -27,10 +27,12 @@ namespace netatmo {
         static async Task DisplayTemp (NetatmoAuth netAuth) {
             List<Device> netatmoDevices = await GetTempAsync (netAuth.GetToken ());
 
+            Console.WriteLine(new String('-',60));
             foreach (Device device in netatmoDevices) {
-                Console.WriteLine ($"{device.station_name}, Temperature: {device.dashboard_data.Temperature}");
+                Console.WriteLine ($"{device.station_name}");
+                Console.WriteLine($" Sensor: {device.module_name }, temperature: {device.dashboard_data.Temperature}");
                 foreach (Module module in device.modules) {
-                    Console.WriteLine ($" Module: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
+                    Console.WriteLine ($" Sensor: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
                 }
             }
         }
