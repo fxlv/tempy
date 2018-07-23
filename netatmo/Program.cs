@@ -10,18 +10,36 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
+using System.Threading.Tasks;
 
 namespace netatmo {
 
     class Program {
 
-        static void Main (string[] args) {
-           
-            NetatmoAuth netAuth = new NetatmoAuth();
-            GetTemp(netAuth.GetToken());
-        }
+        static async Task Main (string[] args) {
 
-        static async void GetTemp (string netatmoaccess_token) {
+            NetatmoAuth netAuth = new NetatmoAuth ();
+            await DisplayTemp(netAuth);
+        }
+        /// <summary>
+        /// Display temperature data on the CLI.
+        /// </summary>
+        static async Task DisplayTemp (NetatmoAuth netAuth) {
+            List<Device> netatmoDevices = await GetTempAsync (netAuth.GetToken ());
+
+            foreach (Device device in netatmoDevices) {
+                Console.WriteLine ($"{device.station_name}, Temperature: {device.dashboard_data.Temperature}");
+                foreach (Module module in device.modules) {
+                    Console.WriteLine ($" Module: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
+                }
+            }
+        }
+        /// <summary>
+        /// Query the Netatmo API for temperature data.
+        /// </summary>
+        /// <param name="netatmoaccess_token">Netatmo token</param>
+        /// <returns></returns>
+        static async Task<List<Device>> GetTempAsync (string netatmoaccess_token) {
             string response = "";
             HttpClient client = new HttpClient ();
             UriBuilder uri = new UriBuilder ("https://api.netatmo.com/api/getstationsdata");
@@ -43,12 +61,7 @@ namespace netatmo {
             var cityData = JsonConvert.DeserializeObject<JObject> (dataResult);
             var devicesResult = cityData["devices"].ToString ();
             List<Device> nDevice = JsonConvert.DeserializeObject<List<Device>> (devicesResult);
-            foreach (Device device in nDevice) {
-                Console.WriteLine ($"{device.station_name}, Temperature: {device.dashboard_data.Temperature}");
-                foreach (Module module in device.modules) {
-                    Console.WriteLine ($" Module: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
-                }
-            }
+            return nDevice;
         }
     }
 }
