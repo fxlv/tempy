@@ -81,7 +81,7 @@ namespace netatmo {
                     } else {
                         oauthObject.isValid = false;
                     }
-                } catch (System.IO.FileNotFoundException e) {
+                } catch (System.IO.FileNotFoundException) {
                     Log.Warning ("Auth file not found");
                 } catch (Exception e) {
                     Log.Warning ("Exception while Loading auth file:");
@@ -108,10 +108,10 @@ namespace netatmo {
                     .AddJsonFile (settingsFile);
 
                 Configuration = builder.Build ();
-            } catch (System.FormatException e) {
+            } catch (System.FormatException) {
                 Console.WriteLine ($"Could not read '{settingsFile}'");
                 Environment.Exit (1);
-            } catch (System.IO.FileNotFoundException e) {
+            } catch (System.IO.FileNotFoundException) {
                 Console.WriteLine ($"Settings file '{settingsFile}' not found");
                 Environment.Exit (0);
             } catch (Exception e) {
