@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace netatmo {
 
@@ -18,8 +19,12 @@ namespace netatmo {
 
         static async Task Main (string[] args) {
 
+            // Set up logging
+            Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information).WriteTo.File("netatmo.log", rollingInterval: RollingInterval.Day).CreateLogger();
+            Log.Debug("Logging started");
             NetatmoAuth netAuth = new NetatmoAuth ();
             await DisplayTemp(netAuth);
+            Log.CloseAndFlush();
         }
         /// <summary>
         /// Display temperature data on the CLI.

@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
+using Serilog;
 
 namespace netatmo {
 
@@ -33,9 +34,9 @@ namespace netatmo {
             oauthObject = new OauthResponseObject ();
             LoadAuth ();
             if (oauthObject.isValid) {
-                Console.WriteLine ("Auth settings loaded from file");
+                 Log.Debug("Auth settings loaded from file");
             } else {
-                Console.WriteLine ("Loaded auth settings were not valid. Will re-authenticate.");
+                Log.Debug("Loaded auth settings were not valid. Will re-authenticate.");
                 DoAuth ();
                 SaveAuth ();
             }
@@ -72,19 +73,19 @@ namespace netatmo {
                     reader = new StreamReader (authSettingsFileName);
                     var contents = reader.ReadToEnd ();
                     oauthObject = JsonConvert.DeserializeObject<OauthResponseObject> (contents);
-                    Console.WriteLine ($"Timestamp now: {timestampNow}, timestam from file: {oauthObject.timestamp}");
+                    Log.Debug ($"Timestamp now: {timestampNow}, timestam from file: {oauthObject.timestamp}");
                     var timestampDelta = timestampNow - oauthObject.timestamp;
                     if (timestampDelta <= 10700) {
-                        Console.WriteLine ($"We seem to have a valid auth token. Delta is {timestampDelta} seconds");
+                       Log.Debug ($"We seem to have a valid auth token. Delta is {timestampDelta} seconds");
                         oauthObject.isValid = true;
                     } else {
                         oauthObject.isValid = false;
                     }
                 } catch (System.IO.FileNotFoundException e) {
-                    Console.WriteLine ("Auth file not found");
+                    Log.Warning ("Auth file not found");
                 } catch (Exception e) {
-                    Console.WriteLine ("Exception while Loading auth file:");
-                    Console.WriteLine (e);
+                    Log.Warning ("Exception while Loading auth file:");
+                    Log.Warning (e.ToString());
 
                 } finally {
                     if (reader != null) {
@@ -92,7 +93,7 @@ namespace netatmo {
                     }
                 }
             } else {
-                Console.WriteLine($"Auth settings file {authSettingsFileName} does not exist.");
+                Log.Warning($"Auth settings file {authSettingsFileName} does not exist.");
             }
         }
         /// <summary>
