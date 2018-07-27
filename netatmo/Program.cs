@@ -52,7 +52,7 @@ namespace netatmo {
             UriBuilder uri = new UriBuilder ("https://api.netatmo.com/api/getstationsdata");
             uri.Query = $"access_token={netatmoaccess_token}";
             try {
-                response = client.GetStringAsync (uri.Uri).Result;
+                response = await client.GetStringAsync (uri.Uri);
             } catch (Exception e) {
                 if (e.InnerException.Message.Contains ("Forbidden")) {
                     Console.WriteLine ("You are using invalid token");
