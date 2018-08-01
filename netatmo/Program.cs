@@ -26,6 +26,22 @@ namespace netatmo {
             await DisplayTemp(netAuth);
             Log.CloseAndFlush();
         }
+        
+        /// <summary>
+        /// Determine if the data is fresh by looking at timestamps
+        /// Fresh here means, not older than 20 minutes.
+        /// </summary>
+        static bool isDataFresh(int unixTimestamp){
+            int maxAllowedDiff = 1200; // 20 minutes
+            var timeStamp = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
+            var now = DateTime.Now;
+            var diff = now - timeStamp;
+            if (diff.TotalSeconds < maxAllowedDiff){
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Display temperature data on the CLI.
         /// </summary>
@@ -34,10 +50,14 @@ namespace netatmo {
 
             Console.WriteLine(new String('-',60));
             foreach (Device device in netatmoDevices) {
-                Console.WriteLine ($"{device.station_name}");
-                Console.WriteLine($" Sensor: {device.module_name }, temperature: {device.dashboard_data.Temperature}");
-                foreach (Module module in device.modules) {
-                    Console.WriteLine ($" Sensor: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
+                if(isDataFresh(device.last_status_store)){
+                    Console.WriteLine ($"{device.station_name}");
+                    Console.WriteLine($" Sensor: {device.module_name }, temperature: {device.dashboard_data.Temperature}");
+                    foreach (Module module in device.modules) {
+                        Console.WriteLine ($" Sensor: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
+                    }
+                } else {
+                    Console.WriteLine ($"Data from device: {device.station_name} is more than 20 minutes old.");
                 }
             }
         }
@@ -53,6 +73,7 @@ namespace netatmo {
             uri.Query = $"access_token={netatmoaccess_token}";
             try {
                 response = await client.GetStringAsync (uri.Uri);
+                Log.Debug($"Response from Netatmo API: {response}");
             } catch (Exception e) {
                 if (e.InnerException.Message.Contains ("Forbidden")) {
                     Console.WriteLine ("You are using invalid token");
