@@ -33,15 +33,50 @@ namespace netatmo {
         /// </summary>
         static bool isDataFresh(int unixTimestamp){
             int maxAllowedDiff = 1200; // 20 minutes
-            var timeStamp = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
-            var now = DateTime.Now;
-            var diff = now - timeStamp;
+            var timeStamp = GetDateTimeOffset(unixTimestamp);
+            var diff = GetTimeDelta(timeStamp);
             if (diff.TotalSeconds < maxAllowedDiff){
                 return true;
             }
             return false;
         }
 
+        /// <summary>
+        /// Convert unixTimestamp (integer) to DateTimeOffset
+        /// </summary>
+        static DateTimeOffset GetDateTimeOffset(int unixTimestamp){
+            var timeStamp = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
+            return timeStamp;
+        }
+
+        /// <summary>
+        /// Calculate the difference between "now" and the provided timestamp
+        /// </summary>
+        static TimeSpan GetTimeDelta(DateTimeOffset timeStamp){
+             var now = DateTime.Now;
+             var diff = now - timeStamp;
+             return diff;
+        }
+        /// <summary>
+        /// Return a human readable string, such as "5 minutes" or "1 minute" etc.
+        /// based on the unix timestamp
+        /// </summary>
+        /// <param name="unixTimestamp"></param>
+        /// <returns>String representation of last update time</returns>
+        static string GetLastUpdateString(int unixTimestamp){
+            var timeStamp = GetDateTimeOffset(unixTimestamp);
+            var delta = GetTimeDelta(timeStamp);
+            string humanReadableString = "unknown";
+            double deltaMinutes = Math.Round(delta.TotalMinutes);
+            if (delta.TotalSeconds < 60){
+                humanReadableString = "less than a minute";
+            } else if (deltaMinutes == 1){
+                humanReadableString = "a minute";
+            } else if (deltaMinutes > 1){
+                humanReadableString = $"{deltaMinutes} minutes";
+            }
+            return humanReadableString;
+        }
         /// <summary>
         /// Display temperature data on the CLI.
         /// </summary>
@@ -51,7 +86,8 @@ namespace netatmo {
             Console.WriteLine(new String('-',60));
             foreach (Device device in netatmoDevices) {
                 if(isDataFresh(device.last_status_store)){
-                    Console.WriteLine ($"{device.station_name}");
+                    var lastUpdateString = GetLastUpdateString(device.last_status_store);
+                    Console.WriteLine ($"{device.station_name} (updated {lastUpdateString} ago)");
                     Console.WriteLine($" Sensor: {device.module_name }, temperature: {device.dashboard_data.Temperature}");
                     foreach (Module module in device.modules) {
                         Console.WriteLine ($" Sensor: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
