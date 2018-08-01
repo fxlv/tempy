@@ -109,13 +109,13 @@ namespace netatmo {
 
                 Configuration = builder.Build ();
             } catch (System.FormatException) {
-                Console.WriteLine ($"Could not read '{settingsFile}'");
+                Log.Warning ($"Could not read '{settingsFile}'");
                 Environment.Exit (1);
             } catch (System.IO.FileNotFoundException) {
-                Console.WriteLine ($"Settings file '{settingsFile}' not found");
+                Log.Warning ($"Settings file '{settingsFile}' not found");
                 Environment.Exit (0);
             } catch (Exception e) {
-                Console.WriteLine ($"Unexpected exception {e}");
+                Log.Warning ($"Unexpected exception {e}");
                 Environment.Exit (1);
             }
 
@@ -126,10 +126,10 @@ namespace netatmo {
             request.AddParameter ("username", Configuration["username"]);
             request.AddParameter ("password", Configuration["password"]);
 
-            Console.WriteLine ("Making the request to Netatmo API");
+            Log.Debug ("Making the request to Netatmo API");
             IRestResponse response = client.Execute (request);
             var content = response.Content;
-            Console.WriteLine (content);
+            Log.Debug (content);
             oauthObject = JsonConvert.DeserializeObject<OauthResponseObject> (content);
         }
     }
