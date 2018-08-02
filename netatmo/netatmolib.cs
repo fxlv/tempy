@@ -1,19 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Runtime.Serialization.Json;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.FileExtensions;
-using Microsoft.Extensions.Configuration.Json;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using RestSharp;
-using RestSharp.Authenticators;
 
-namespace netatmo {
+namespace netatmo
+{
     #region Netatmo Oauth response 
-    public class OauthResponseObject {
+
+    public class OauthResponseObject
+    {
         public string access_token { get; set; }
         public string refresh_token { get; set; }
         public List<string> scope { get; set; }
@@ -22,18 +14,24 @@ namespace netatmo {
         public bool isValid { get; set; } = false;
         public long timestamp { get; set; }
     }
+
     #endregion
 
     #region Netatmo object definition
-    public class DefaultAlarm {
+
+    public class DefaultAlarm
+    {
         public int db_alarm_number { get; set; }
     }
-    public class AlarmConfig {
+
+    public class AlarmConfig
+    {
         public List<DefaultAlarm> default_alarm { get; set; }
         public List<object> personnalized { get; set; }
     }
 
-    public class DashboardData {
+    public class DashboardData
+    {
         public double AbsolutePressure { get; set; }
         public int CO2 { get; set; }
         public int Humidity { get; set; }
@@ -49,7 +47,8 @@ namespace netatmo {
         public int time_utc { get; set; }
     }
 
-    public class DashboardData2 {
+    public class DashboardData2
+    {
         public int Humidity { get; set; }
         public double Temperature { get; set; }
         public int date_max_temp { get; set; }
@@ -61,7 +60,8 @@ namespace netatmo {
         public int? CO2 { get; set; }
     }
 
-    public class Module {
+    public class Module
+    {
         public string _id { get; set; }
         public int battery_percent { get; set; }
         public int battery_vp { get; set; }
@@ -76,7 +76,8 @@ namespace netatmo {
         public string type { get; set; }
     }
 
-    public class Place {
+    public class Place
+    {
         public string city { get; set; }
         public string country { get; set; }
         public List<double> location { get; set; }
@@ -84,7 +85,8 @@ namespace netatmo {
         public bool? improveLocProposed { get; set; }
     }
 
-    public class Device {
+    public class Device
+    {
         public string _id { get; set; }
         public string access_code { get; set; }
         public bool air_quality_available { get; set; }
@@ -110,7 +112,8 @@ namespace netatmo {
         public int wifi_status { get; set; }
     }
 
-    public class Administrative {
+    public class Administrative
+    {
         public int feel_like_algo { get; set; }
         public string lang { get; set; }
         public int pressureunit { get; set; }
@@ -119,17 +122,18 @@ namespace netatmo {
         public int windunit { get; set; }
     }
 
-    public class User {
+    public class User
+    {
         public Administrative administrative { get; set; }
         public bool fb_chatbot_available { get; set; }
         public string mail { get; set; }
     }
 
-    public class Body {
+    public class Body
+    {
         public List<Device> devices { get; set; }
         public User user { get; set; }
     }
 
     #endregion
-
 }
