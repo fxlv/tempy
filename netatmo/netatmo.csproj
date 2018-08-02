@@ -12,10 +12,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="restsharp" Version="106.3.1" />
     <Content Include="Program.cs" />
-    <Content Include="netatmolib.cs" />
-    <Content Include="NetatmoAuth.cs" />
     <PackageReference Include="serilog" Version="2.7.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetatmoLib\NetatmoLib.csproj" />
   </ItemGroup>
 </Project>

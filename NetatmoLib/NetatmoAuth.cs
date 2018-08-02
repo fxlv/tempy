@@ -12,7 +12,7 @@ namespace netatmo
     ///     Authentication class takes care of logging in to Netatmo
     ///     acquiring the Oauth token and saving it for re-use.
     /// </summary>
-    internal class NetatmoAuth
+    public class NetatmoAuth
     {
         private readonly string authSettingsFileName = "authsettings.bin";
 
