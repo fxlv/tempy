@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace netatmo
+namespace NetatmoLib
 {
     #region Netatmo Oauth response 
 

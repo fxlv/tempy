@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using NetatmoLib;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using Serilog.Events;
 
-namespace netatmo
+namespace NetatmoCLI
 {
     internal class Program
     {
@@ -23,38 +24,6 @@ namespace netatmo
         }
 
         /// <summary>
-        ///     Determine if the data is fresh by looking at timestamps
-        ///     Fresh here means, not older than 20 minutes.
-        /// </summary>
-        private static bool isDataFresh(int unixTimestamp)
-        {
-            var maxAllowedDiff = 1200; // 20 minutes
-            var timeStamp = GetDateTimeOffset(unixTimestamp);
-            var diff = GetTimeDelta(timeStamp);
-            if (diff.TotalSeconds < maxAllowedDiff) return true;
-            return false;
-        }
-
-        /// <summary>
-        ///     Convert unixTimestamp (integer) to DateTimeOffset
-        /// </summary>
-        private static DateTimeOffset GetDateTimeOffset(int unixTimestamp)
-        {
-            var timeStamp = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
-            return timeStamp;
-        }
-
-        /// <summary>
-        ///     Calculate the difference between "now" and the provided timestamp
-        /// </summary>
-        private static TimeSpan GetTimeDelta(DateTimeOffset timeStamp)
-        {
-            var now = DateTime.Now;
-            var diff = now - timeStamp;
-            return diff;
-        }
-
-        /// <summary>
         ///     Return a human readable string, such as "5 minutes" or "1 minute" etc.
         ///     based on the unix timestamp
         /// </summary>
@@ -62,8 +31,8 @@ namespace netatmo
         /// <returns>String representation of last update time</returns>
         private static string GetLastUpdateString(int unixTimestamp)
         {
-            var timeStamp = GetDateTimeOffset(unixTimestamp);
-            var delta = GetTimeDelta(timeStamp);
+            var timeStamp = DateTimeOps.GetDateTimeOffset(unixTimestamp);
+            var delta = DateTimeOps.GetTimeDelta(timeStamp);
             var humanReadableString = "unknown";
             var deltaMinutes = Math.Round(delta.TotalMinutes);
             if (delta.TotalSeconds < 60) humanReadableString = "less than a minute";
@@ -81,7 +50,7 @@ namespace netatmo
 
             Console.WriteLine(new string('-', 60));
             foreach (var device in netatmoDevices)
-                if (isDataFresh(device.last_status_store))
+                if (DateTimeOps.IsDataFresh(device.last_status_store))
                 {
                     var lastUpdateString = GetLastUpdateString(device.last_status_store);
                     Console.WriteLine($"{device.station_name} (updated {lastUpdateString} ago)");

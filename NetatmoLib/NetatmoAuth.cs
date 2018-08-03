@@ -6,7 +6,7 @@ using RestSharp;
 using RestSharp.Authenticators;
 using Serilog;
 
-namespace netatmo
+namespace NetatmoLib
 {
     /// <summary>
     ///     Authentication class takes care of logging in to Netatmo

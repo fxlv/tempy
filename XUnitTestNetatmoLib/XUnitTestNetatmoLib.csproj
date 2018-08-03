@@ -11,4 +11,7 @@
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
     <Content Include="UnitTest1.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetatmoLib\NetatmoLib.csproj" />
+  </ItemGroup>
 </Project>

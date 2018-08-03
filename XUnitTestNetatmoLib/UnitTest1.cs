@@ -8,8 +8,7 @@ namespace XUnitTestNetatmoLib
         [Fact]
         public void Test1()
         {
-            var netAuth = new netatmo.NetatmoAuth();
-
+            var netAuth = new NetatmoLib.NetatmoAuth();
         }
         }
 }
