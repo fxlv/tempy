@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using NetatmoLib;
 using Newtonsoft.Json;
@@ -10,6 +11,30 @@ using Serilog.Events;
 
 namespace NetatmoCLI
 {
+    public class Arguments
+    {
+        private readonly bool _loop;
+
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public Arguments(string[] args)
+        {
+            if (args.Length > 0)
+            {
+                Console.WriteLine(args);
+                if (args[0] == "-loop") _loop = true;
+                var argumentsParsedSuccessfully = true;
+
+                Loop = _loop;
+                ArgumentsParsedSuccessfully = argumentsParsedSuccessfully;
+            }
+        }
+
+        public bool Loop { get; }
+        public bool ArgumentsParsedSuccessfully { get; }
+    }
+
     internal class Program
     {
         private static async Task Main(string[] args)
@@ -18,10 +43,29 @@ namespace NetatmoCLI
             Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console(LogEventLevel.Information)
                 .WriteTo.File("netatmo.log", rollingInterval: RollingInterval.Day).CreateLogger();
             Log.Debug("Logging started");
+            Console.Title = "NetatmoCLI";
             var netAuth = new NetatmoAuth();
+
+            var arguments = new Arguments(args);
+            if (arguments.Loop)
+            {
+                Log.Debug("Doing a loop");
+                while (true)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Updating data in a loop...");
+                    Console.Out.Flush();
+
+
+                    await DisplayTemp(netAuth);
+                    Thread.Sleep(5000);
+                }
+            }
+
             await DisplayTemp(netAuth);
             Log.CloseAndFlush();
         }
+
 
         /// <summary>
         ///     Return a human readable string, such as "5 minutes" or "1 minute" etc.
@@ -64,7 +108,8 @@ namespace NetatmoCLI
                 {
                     Console.WriteLine($"Data from device: {device.station_name} is more than 20 minutes old.");
                 }
-            Console.ReadKey();
+
+            Console.Out.Flush();
         }
 
         /// <summary>
@@ -94,6 +139,7 @@ namespace NetatmoCLI
                     Console.WriteLine("Unexpected exception while sending request to Netatmo API");
                     Console.WriteLine(e.InnerException.Message);
                 }
+
                 Environment.Exit(1);
             }
 
