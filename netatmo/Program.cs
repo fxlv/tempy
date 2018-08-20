@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using CommandLine;
 using NetatmoLib;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,32 +12,25 @@ using Serilog.Events;
 
 namespace NetatmoCLI
 {
-    public class Arguments
+    public class Options
     {
-        private readonly bool _loop;
-
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        public Arguments(string[] args)
-        {
-            if (args.Length > 0)
-            {
-                Console.WriteLine(args);
-                if (args[0] == "-loop") _loop = true;
-                var argumentsParsedSuccessfully = true;
-
-                Loop = _loop;
-                ArgumentsParsedSuccessfully = argumentsParsedSuccessfully;
-            }
-        }
-
-        public bool Loop { get; }
-        public bool ArgumentsParsedSuccessfully { get; }
+        [Option('l', "loop", Required = false, HelpText = "Refresh temperature data continuously in a loop.")]
+        public bool Loop { get; set; }
     }
 
     internal class Program
     {
+        /// <summary>
+        ///     Exit and optionally print an error message.
+        /// </summary>
+        /// <param name="msg"></param>
+        public static void Die(string msg = null)
+        {
+            if (msg != null)
+                Log.Fatal($"ERROR: {msg}");
+            Environment.Exit(1);
+        }
+
         private static async Task Main(string[] args)
         {
             // Set up logging
@@ -46,8 +40,11 @@ namespace NetatmoCLI
             Console.Title = "NetatmoCLI";
             var netAuth = new NetatmoAuth();
 
-            var arguments = new Arguments(args);
-            if (arguments.Loop)
+            var options = new Options();
+            // Parse arguments using CommandLine module
+            Parser.Default.ParseArguments<Options>(args).WithParsed(o => { options = o; });
+
+            if (options.Loop)
             {
                 Log.Debug("Doing a loop");
                 while (true)
@@ -55,15 +52,15 @@ namespace NetatmoCLI
                     Console.Clear();
                     Console.WriteLine("Updating data in a loop...");
                     Console.Out.Flush();
-
-
                     await DisplayTemp(netAuth);
                     Thread.Sleep(5000);
                 }
             }
-
-            await DisplayTemp(netAuth);
-            Log.CloseAndFlush();
+            else
+            {
+                await DisplayTemp(netAuth);
+                Log.CloseAndFlush();
+            }
         }
 
 
@@ -88,7 +85,7 @@ namespace NetatmoCLI
         /// <summary>
         ///     Display temperature data on the CLI.
         /// </summary>
-        private static async Task DisplayTemp(NetatmoAuth netAuth)
+        public static async Task DisplayTemp(NetatmoAuth netAuth)
         {
             var netatmoDevices = await GetTempAsync(netAuth.GetToken());
 
