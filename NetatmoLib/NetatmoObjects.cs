@@ -2,10 +2,6 @@ using System.Collections.Generic;
 
 namespace NetatmoLib
 {
-    #region Netatmo Oauth response 
-
-    #endregion
-
     #region Netatmo object definition
 
     public class DefaultAlarm

@@ -87,7 +87,7 @@ namespace NetatmoCLI
         /// </summary>
         public static async Task DisplayTemp(NetatmoAuth netAuth)
         {
-            var netatmoDevices = await GetTempAsync(netAuth.GetToken());
+            var netatmoDevices = await NetatmoQueries.GetTempAsync(netAuth.GetToken());
 
             Console.WriteLine(new string('-', 60));
             foreach (var device in netatmoDevices)
@@ -109,43 +109,6 @@ namespace NetatmoCLI
             Console.Out.Flush();
         }
 
-        /// <summary>
-        ///     Query the Netatmo API for temperature data.
-        /// </summary>
-        /// <param name="netatmoaccess_token">Netatmo token</param>
-        /// <returns></returns>
-        private static async Task<List<Device>> GetTempAsync(string netatmoaccess_token)
-        {
-            var response = "";
-            var client = new HttpClient();
-            var uri = new UriBuilder("https://api.netatmo.com/api/getstationsdata");
-            uri.Query = $"access_token={netatmoaccess_token}";
-            try
-            {
-                response = await client.GetStringAsync(uri.Uri);
-                Log.Debug($"Response from Netatmo API: {response}");
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException.Message.Contains("Forbidden"))
-                {
-                    Console.WriteLine("You are using invalid token");
-                }
-                else
-                {
-                    Console.WriteLine("Unexpected exception while sending request to Netatmo API");
-                    Console.WriteLine(e.InnerException.Message);
-                }
-
-                Environment.Exit(1);
-            }
-
-            var jsonObject = JsonConvert.DeserializeObject<JObject>(response);
-            var dataResult = jsonObject["body"].ToString();
-            var cityData = JsonConvert.DeserializeObject<JObject>(dataResult);
-            var devicesResult = cityData["devices"].ToString();
-            var nDevice = JsonConvert.DeserializeObject<List<Device>>(devicesResult);
-            return nDevice;
-        }
+        
     }
 }
