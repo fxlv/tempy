@@ -31,10 +31,12 @@ namespace NetatmoLib
             {
                 if (e.InnerException.Message.Contains("Forbidden"))
                 {
+                    // TODO: No writing to Console from within a library
                     Console.WriteLine("You are using invalid token");
                 }
                 else
                 {
+                    // TODO: No writing to Console from within a library
                     Console.WriteLine("Unexpected exception while sending request to Netatmo API");
                     Console.WriteLine(e.InnerException.Message);
                 }

@@ -34,5 +34,24 @@ namespace NetatmoLib
             if (diff.TotalSeconds < maxAge) return true;
             return false;
         }
+
+        /// <summary>
+        ///     Return a human readable string, such as "5 minutes" or "1 minute" etc.
+        ///     based on the unix timestamp
+        /// </summary>
+        /// <param name="unixTimestamp"></param>
+        /// <returns>String representation of last update time</returns>
+        public static string GetLastUpdateString(int unixTimestamp)
+        {
+            var timeStamp = DateTimeOps.GetDateTimeOffset(unixTimestamp);
+            var delta = DateTimeOps.GetTimeDelta(timeStamp);
+            var humanReadableString = "unknown";
+            var deltaMinutes = Math.Round(delta.TotalMinutes);
+            if (delta.TotalSeconds < 60) humanReadableString = "less than a minute";
+            else if (deltaMinutes == 1) humanReadableString = "a minute";
+            else if ((deltaMinutes > 1 ) && (deltaMinutes  <= 60))  humanReadableString = $"{deltaMinutes} minutes";
+            else if (deltaMinutes > 60) humanReadableString = $"more than an hour";
+            return humanReadableString;
+        }
     }
 }
