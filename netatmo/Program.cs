@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CommandLine;
 using NetatmoLib;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Serilog;
 using Serilog.Events;
 
@@ -56,30 +52,24 @@ namespace NetatmoCLI
                     Thread.Sleep(5000);
                 }
             }
-            else
-            {
-                await DisplayTemp(netAuth);
-                Log.CloseAndFlush();
-            }
+
+            await DisplayTemp(netAuth);
+            Log.CloseAndFlush();
         }
 
 
         /// <summary>
-        ///     Return a human readable string, such as "5 minutes" or "1 minute" etc.
-        ///     based on the unix timestamp
+        /// Display status of one device.
         /// </summary>
-        /// <param name="unixTimestamp"></param>
-        /// <returns>String representation of last update time</returns>
-        private static string GetLastUpdateString(int unixTimestamp)
+        public static void DisplayDevice(Device device)
         {
-            var timeStamp = DateTimeOps.GetDateTimeOffset(unixTimestamp);
-            var delta = DateTimeOps.GetTimeDelta(timeStamp);
-            var humanReadableString = "unknown";
-            var deltaMinutes = Math.Round(delta.TotalMinutes);
-            if (delta.TotalSeconds < 60) humanReadableString = "less than a minute";
-            else if (deltaMinutes == 1) humanReadableString = "a minute";
-            else if (deltaMinutes > 1) humanReadableString = $"{deltaMinutes} minutes";
-            return humanReadableString;
+            var lastUpdateString = DateTimeOps.GetLastUpdateString(device.last_status_store);
+            Console.WriteLine($"{device.station_name} (updated {lastUpdateString} ago)");
+            Console.WriteLine(
+                $" Sensor: {device.module_name}, temperature: {device.dashboard_data.Temperature}");
+            foreach (var module in device.modules)
+                Console.WriteLine(
+                    $" Sensor: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
         }
 
         /// <summary>
@@ -93,13 +83,7 @@ namespace NetatmoCLI
             foreach (var device in netatmoDevices)
                 if (DateTimeOps.IsDataFresh(device.last_status_store))
                 {
-                    var lastUpdateString = GetLastUpdateString(device.last_status_store);
-                    Console.WriteLine($"{device.station_name} (updated {lastUpdateString} ago)");
-                    Console.WriteLine(
-                        $" Sensor: {device.module_name}, temperature: {device.dashboard_data.Temperature}");
-                    foreach (var module in device.modules)
-                        Console.WriteLine(
-                            $" Sensor: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
+                    DisplayDevice(device);
                 }
                 else
                 {
@@ -108,7 +92,5 @@ namespace NetatmoCLI
 
             Console.Out.Flush();
         }
-
-        
     }
 }
