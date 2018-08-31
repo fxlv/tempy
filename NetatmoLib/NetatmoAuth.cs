@@ -129,17 +129,17 @@ namespace NetatmoLib
             }
             catch (FormatException)
             {
-                Log.Warning($"Could not read '{settingsFile}'");
+                Log.Error($"Could not read '{settingsFile}'. Exiting.");
                 Environment.Exit(1);
             }
             catch (FileNotFoundException)
             {
-                Log.Warning($"Settings file '{settingsFile}' not found");
+                Log.Error($"Settings file '{settingsFile}' not found. Exiting.");
                 Environment.Exit(0);
             }
             catch (Exception e)
             {
-                Log.Warning($"Unexpected exception {e}");
+                Log.Error($"Unexpected exception {e}");
                 Environment.Exit(1);
             }
 
