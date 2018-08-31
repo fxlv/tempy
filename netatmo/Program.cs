@@ -5,6 +5,7 @@ using CommandLine;
 using NetatmoLib;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace NetatmoCLI
 {
@@ -30,7 +31,7 @@ namespace NetatmoCLI
         private static async Task Main(string[] args)
         {
             // Set up logging
-            Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console(LogEventLevel.Information)
+            Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console(LogEventLevel.Information, theme: ConsoleTheme.None)
                 .WriteTo.File("netatmo.log", rollingInterval: RollingInterval.Day).CreateLogger();
             Log.Debug("Logging started");
             Console.Title = "NetatmoCLI";
