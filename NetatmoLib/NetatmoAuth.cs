@@ -36,6 +36,7 @@ namespace NetatmoLib
                 DoAuth();
                 SaveAuth();
             }
+
             access_token = oauthObject.access_token;
         }
 

@@ -29,8 +29,8 @@ namespace NetatmoLib
         /// </summary>
         public static bool IsDataFresh(int unixTimestamp, int maxAge = 1200)
         {
-            var timeStamp = DateTimeOps.GetDateTimeOffset(unixTimestamp);
-            var diff = DateTimeOps.GetTimeDelta(timeStamp);
+            var timeStamp = GetDateTimeOffset(unixTimestamp);
+            var diff = GetTimeDelta(timeStamp);
             if (diff.TotalSeconds < maxAge) return true;
             return false;
         }
@@ -43,14 +43,14 @@ namespace NetatmoLib
         /// <returns>String representation of last update time</returns>
         public static string GetLastUpdateString(int unixTimestamp)
         {
-            var timeStamp = DateTimeOps.GetDateTimeOffset(unixTimestamp);
-            var delta = DateTimeOps.GetTimeDelta(timeStamp);
+            var timeStamp = GetDateTimeOffset(unixTimestamp);
+            var delta = GetTimeDelta(timeStamp);
             var humanReadableString = "unknown";
             var deltaMinutes = Math.Round(delta.TotalMinutes);
             if (delta.TotalSeconds < 60) humanReadableString = "less than a minute";
             else if (deltaMinutes == 1) humanReadableString = "a minute";
-            else if ((deltaMinutes > 1 ) && (deltaMinutes  <= 60))  humanReadableString = $"{deltaMinutes} minutes";
-            else if (deltaMinutes > 60) humanReadableString = $"more than an hour";
+            else if (deltaMinutes > 1 && deltaMinutes <= 60) humanReadableString = $"{deltaMinutes} minutes";
+            else if (deltaMinutes > 60) humanReadableString = "more than an hour";
             return humanReadableString;
         }
     }
