@@ -33,6 +33,7 @@ namespace NetatmoCLI
             // Set up logging
             Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console(LogEventLevel.Information, theme: ConsoleTheme.None)
                 .WriteTo.File("netatmo.log", rollingInterval: RollingInterval.Day).CreateLogger();
+            // TODO: Get log file path from a configuration
             Log.Debug("Logging started");
             Console.Title = "NetatmoCLI";
             var netAuth = new NetatmoAuth();
