@@ -33,3 +33,5 @@ bin
 obj
 .vscode*
 authsettings.bin
+.DS_Store
+.idea
