@@ -4,34 +4,36 @@ using Microsoft.AspNetCore.Mvc;
 namespace TempyAPI.Controllers
 
 {
-    
-
-
-    [Route("api/[controller]")]
+    [Route("api/measurements")]
     [ApiController]
     public class MeasurementsController : ControllerBase
     {
         // GET api/measurements
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public JsonResult GetAllMeasurementst()
         {
-            return new[] {"value1", "value2"};
+           var db = new TempyDB();
+           var result = db.GetTemperatureMeasurements();
+            return new JsonResult(result);
+        }
+
+        // GET api/measurements/name/<>
+        [HttpGet("name/{name}")]
+        public JsonResult GetLastMeasurement(string name)  
+        {
+            var db = new TempyDB();
+            var result = db.GetLatestTemperatureMeasurementByName(name);
+            return new JsonResult(result);
+            
         }
 
 
-        // GET api/measurements/something
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(string id)
-        {
-            return $"String value {id}";
-        }
-
-        
-      
         [HttpPost]
-        public string Post([FromBody] DataObjects.TemperatureMeasurement value)
+        public string Post([FromBody] DataObjects.TemperatureMeasurement tempMeasurement)
         {
-            return value.ToString();
+            var db = new TempyDB();
+            db.WriteDocument(tempMeasurement);
+            return tempMeasurement.ToString();
         }
     }
 }
