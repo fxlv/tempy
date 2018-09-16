@@ -33,9 +33,10 @@ namespace TempyAPI
                 // TODO: Handle exceptions by displaying nice error pages for PROD
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
+                app.UseHttpsRedirection();
+
             }
 
-            app.UseHttpsRedirection();
             app.UseMvc();
         }
     }

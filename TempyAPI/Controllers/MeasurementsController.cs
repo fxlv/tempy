@@ -27,7 +27,7 @@ namespace TempyAPI.Controllers
             
         }
 
-
+        // POST api/measurements
         [HttpPost]
         public string Post([FromBody] DataObjects.TemperatureMeasurement tempMeasurement)
         {

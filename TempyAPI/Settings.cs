@@ -22,7 +22,7 @@ namespace TempyAPI
     {
         //TODO: use better approach at handling settings, it should not be done here
 
-        //TODO: build settings file path based on environment
+        //TODO: build settings file path based on environment and test if file exists
         private readonly string settingsFIle = "/Users/fx/.tempy.settings";
 
         public Settings()
