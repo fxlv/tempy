@@ -14,6 +14,7 @@ namespace NetatmoLib
     /// </summary>
     public class NetatmoAuth
     {
+        // TODO: move authsettings file name to a separate settings file
         private readonly string authSettingsFileName = "authsettings.bin";
 
         private OauthResponseObject oauthObject;

@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 
+
 namespace NetatmoLib
 {
     public class NetatmoQueries
