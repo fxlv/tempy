@@ -21,6 +21,7 @@ namespace TempyWorker
                 .Console(LogEventLevel.Information, theme: ConsoleTheme.None)
                 .WriteTo.File("worker.log", rollingInterval: RollingInterval.Day).CreateLogger();
             Log.Debug("logging started");
+            Console.Title = "Tempy Worker";
             WorkerRunner();
             // go into loop and constantly (configurable sleep interval) call worker()
 
@@ -64,8 +65,9 @@ namespace TempyWorker
                 var json = JsonConvert.SerializeObject(measurement);
                 request.AddHeader("Content-Type", "application/json");
                 request.AddParameter("application/json; charset=utf-8", json, ParameterType.RequestBody);
-                
-               
+                // todo: make the execute async
+                client.Execute(request);
+
 
             }
             // do netatmo auth

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using System;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
 namespace TempyAPI
@@ -14,6 +15,7 @@ namespace TempyAPI
         {
             
             // TODO: setup logging
+            Console.Title = "Tempy API";
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();
         }
