@@ -33,6 +33,7 @@ namespace TempyAPI.Controllers
         {
             var db = new TempyDB();
             db.WriteDocument(tempMeasurement);
+            //todo: return only status code
             return tempMeasurement.ToString();
         }
     }

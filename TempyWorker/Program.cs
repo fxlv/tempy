@@ -35,6 +35,8 @@ namespace TempyWorker
                 Worker();
             }
         }
+        
+        
         async public static void  Worker(int sleepSeconds = 300){
             
             Log.Debug("doing worker run");
@@ -49,24 +51,31 @@ namespace TempyWorker
             foreach (var device in devices)
             {
 
-                var measurement = new TempyAPI.DataObjects.TemperatureMeasurement();
-                measurement.Name = device.station_name;
-                measurement.Value = (float) device.dashboard_data.Temperature;
-                measurement.UnixTimestamp = device.last_status_store;
-                measurement.Source = new DataObjects.TemperatureSource();
-                measurement.Source.Name = device.module_name;
-                measurement.Source.Location = $"{device.place.city}, {device.place.country}";
-                measurement.Source.Type = 0;
+                var temperatureMeasurement = new TempyAPI.DataObjects.TemperatureMeasurement();
+                temperatureMeasurement.Name = device.station_name;
+                temperatureMeasurement.Value = (float) device.dashboard_data.Temperature;
+                temperatureMeasurement.UnixTimestamp = device.last_status_store;
+                temperatureMeasurement.Source = new DataObjects.Source();
+                temperatureMeasurement.Source.Name = device.module_name;
+                temperatureMeasurement.Source.Location = $"{device.place.city}, {device.place.country}";
+                temperatureMeasurement.Source.Type =  DataObjects.SourceType.Temperature;
                 
-                var client = new RestClient();
-                client.BaseUrl = new Uri("http://localhost:5000/");
-                var request = new RestRequest("api/measurements", Method.POST);
-                request.RequestFormat = DataFormat.Json;
-                var json = JsonConvert.SerializeObject(measurement);
-                request.AddHeader("Content-Type", "application/json");
-                request.AddParameter("application/json; charset=utf-8", json, ParameterType.RequestBody);
-                // todo: make the execute async
-                client.Execute(request);
+                var humidityMeasurement = new TempyAPI.DataObjects.HumidityMeasurement();
+                humidityMeasurement.Name = device.station_name;
+                humidityMeasurement.Value = (float) device.dashboard_data.Humidity;
+                humidityMeasurement.UnixTimestamp = device.last_status_store;
+                humidityMeasurement.Source = new DataObjects.Source();
+                humidityMeasurement.Source.Name = device.module_name;
+                humidityMeasurement.Source.Location = $"{device.place.city}, {device.place.country}";
+                humidityMeasurement.Source.Type = DataObjects.SourceType.Humidity;
+                
+                
+              
+                PostMeasurement(temperatureMeasurement);
+                PostMeasurement(humidityMeasurement);
+
+         
+                
 
 
             }
@@ -80,5 +89,21 @@ namespace TempyWorker
             Thread.Sleep(sleepSeconds);
 
         }
+
+
+        public static void PostMeasurement(DataObjects.Measurement measurement)
+        {
+            var client = new RestClient();
+            client.BaseUrl = new Uri("http://localhost:5000/");
+            var request = new RestRequest("api/measurements", Method.POST);
+            request.RequestFormat = DataFormat.Json;
+            var json = JsonConvert.SerializeObject(measurement);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddParameter("application/json; charset=utf-8", json, ParameterType.RequestBody);
+            // todo: make the execute async
+            client.Execute(request);
+        }
+        
+        
     }
 }

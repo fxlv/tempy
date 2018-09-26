@@ -18,31 +18,40 @@ namespace TempyAPI
         {
             public string Name { get; set; }
             public SourceType Type { get; set; }
+            public string Location { get; set; }
+
         }
 
-        public class TemperatureSource : Source
-        {
-            public string Location { get; set; }
-        }
+   
 
         public class Measurement
         {
+            [JsonProperty(PropertyName = "id")] public string Id { set; get; }
+
             public string Name { get; set; }
+            public Source Source { get; set; }
+            public float Value { get; set; }
 
             // TODO: convert timestamp to datetime upon SET?
             public int UnixTimestamp { get; set; }
-        }
-
-        public class TemperatureMeasurement : Measurement
-        {
-            [JsonProperty(PropertyName = "id")] public string Id { set; get; }
-            public TemperatureSource Source { get; set; }
-            public float Value { get; set; }
-
+            
             public override string ToString()
             {
                 return JsonConvert.SerializeObject(this);
             }
+            
+       
+        }
+
+        public class HumidityMeasurement : Measurement
+        {
+
+       
+        }
+        
+        public class TemperatureMeasurement : Measurement
+        {
+            
         }
     }
 }
