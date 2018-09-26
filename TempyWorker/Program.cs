@@ -51,7 +51,7 @@ namespace TempyWorker
 
                 var measurement = new TempyAPI.DataObjects.TemperatureMeasurement();
                 measurement.Name = device.station_name;
-                measurement.Value = (int) device.dashboard_data.Temperature;
+                measurement.Value = (float) device.dashboard_data.Temperature;
                 measurement.UnixTimestamp = device.last_status_store;
                 measurement.Source = new DataObjects.TemperatureSource();
                 measurement.Source.Name = device.module_name;
