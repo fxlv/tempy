@@ -19,9 +19,9 @@ namespace TempyAPI
 
         }
 
-        public void WriteDocument(DataObjects.TemperatureMeasurement tempMeasurement)
+        public void WriteDocument(DataObjects.Measurement measurement)
         {
-            client.CreateDocumentAsync(collectionUri, tempMeasurement);
+            client.CreateDocumentAsync(collectionUri, measurement);
         }
 
         

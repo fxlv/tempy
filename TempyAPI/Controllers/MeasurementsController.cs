@@ -29,12 +29,12 @@ namespace TempyAPI.Controllers
 
         // POST api/measurements
         [HttpPost]
-        public string Post([FromBody] DataObjects.TemperatureMeasurement tempMeasurement)
+        public string Post([FromBody] DataObjects.Measurement measurement)
         {
             var db = new TempyDB();
-            db.WriteDocument(tempMeasurement);
+            db.WriteDocument(measurement);
             //todo: return only status code
-            return tempMeasurement.ToString();
+            return measurement.ToString();
         }
     }
 }

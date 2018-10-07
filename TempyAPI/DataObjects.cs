@@ -6,7 +6,7 @@ namespace TempyAPI
 {
     public class DataObjects
     {
-        public enum SourceType
+        public enum MeasurementType
         {
             Temperature,
             Humidity,
@@ -17,7 +17,6 @@ namespace TempyAPI
         public class Source
         {
             public string Name { get; set; }
-            public SourceType Type { get; set; }
             public string Location { get; set; }
 
         }
@@ -27,14 +26,13 @@ namespace TempyAPI
         public class Measurement
         {
             [JsonProperty(PropertyName = "id")] public string Id { set; get; }
-
+            public MeasurementType Type { get; set; }
             public string Name { get; set; }
             public Source Source { get; set; }
             public float Value { get; set; }
-
             // TODO: convert timestamp to datetime upon SET?
             public int UnixTimestamp { get; set; }
-            
+
             public override string ToString()
             {
                 return JsonConvert.SerializeObject(this);
@@ -45,7 +43,6 @@ namespace TempyAPI
 
         public class HumidityMeasurement : Measurement
         {
-
        
         }
         
