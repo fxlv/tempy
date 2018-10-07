@@ -8,11 +8,9 @@ namespace TempyAPI
         [JsonProperty("DocumentDBEndpointUri")]
         public string DocumentDBEndpointUri { get; set; }
 
-        [JsonProperty("DocumentDBPrimaryKey")]
-        public string DocumentDBPrimaryKey { get; set; }
+        [JsonProperty("DocumentDBPrimaryKey")] public string DocumentDBPrimaryKey { get; set; }
 
-        [JsonProperty("DocumentDBDatabaseId")]
-        public string DocumentDBDatabaseId { get; set; }
+        [JsonProperty("DocumentDBDatabaseId")] public string DocumentDBDatabaseId { get; set; }
 
         [JsonProperty("DocumentDBCollectionId")]
         public string DocumentDBCollectionId { get; set; }

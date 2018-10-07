@@ -34,7 +34,6 @@ namespace TempyAPI
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
                 app.UseHttpsRedirection();
-
             }
 
             app.UseMvc();

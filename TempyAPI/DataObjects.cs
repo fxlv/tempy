@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace TempyAPI
@@ -18,10 +16,8 @@ namespace TempyAPI
         {
             public string Name { get; set; }
             public string Location { get; set; }
-
         }
 
-   
 
         public class Measurement
         {
@@ -29,7 +25,9 @@ namespace TempyAPI
             public MeasurementType Type { get; set; }
             public string Name { get; set; }
             public Source Source { get; set; }
+
             public float Value { get; set; }
+
             // TODO: convert timestamp to datetime upon SET?
             public int UnixTimestamp { get; set; }
 
@@ -37,18 +35,14 @@ namespace TempyAPI
             {
                 return JsonConvert.SerializeObject(this);
             }
-            
-       
         }
 
         public class HumidityMeasurement : Measurement
         {
-       
         }
-        
+
         public class TemperatureMeasurement : Measurement
         {
-            
         }
     }
 }

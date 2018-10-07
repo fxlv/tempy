@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
-using Microsoft.VisualBasic.CompilerServices;
-using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
 using NetatmoLib;
 using Newtonsoft.Json;
 using RestSharp;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 using TempyAPI;
 
 namespace TempyWorker
@@ -24,21 +22,16 @@ namespace TempyWorker
             Console.Title = "Tempy Worker";
             WorkerRunner();
             // go into loop and constantly (configurable sleep interval) call worker()
-
-
         }
 
         public static void WorkerRunner()
         {
-            while (true)
-            {
-                Worker();
-            }
+            while (true) Worker();
         }
-        
-        
-        async public static void  Worker(int sleepSeconds = 300){
 
+
+        public static async void Worker(int sleepSeconds = 300)
+        {
             // do netatmo auth
             // initializes netatmolib
             // queries netatmo for data about all sensors
@@ -52,33 +45,37 @@ namespace TempyWorker
             // for now, run synchronously
             // TODO: change this to run async
             var devices = NetatmoQueries.GetTempAsync(auth.GetToken()).GetAwaiter().GetResult();
-            
+
             foreach (var device in devices)
             {
                 PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
                 PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
                 PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
             }
-           
+
             sleepSeconds = sleepSeconds * 1000;
             Thread.Sleep(sleepSeconds);
-
         }
 
-        public static DataObjects.Measurement AssembleMeasurement(Device device, DataObjects.MeasurementType measurementType)
+        public static DataObjects.Measurement AssembleMeasurement(Device device,
+            DataObjects.MeasurementType measurementType)
         {
             Log.Debug($"Assembling {measurementType} measurement for device {device}");
-            var measurement = new TempyAPI.DataObjects.Measurement();
+            var measurement = new DataObjects.Measurement();
 
-            if(measurementType == DataObjects.MeasurementType.Temperature){
-                measurement.Value = (float)device.dashboard_data.Temperature;
+            if (measurementType == DataObjects.MeasurementType.Temperature)
+            {
+                measurement.Value = (float) device.dashboard_data.Temperature;
                 measurement.Type = DataObjects.MeasurementType.Temperature;
-            } else if (measurementType == DataObjects.MeasurementType.Humidity){
-                measurement.Value = (float)device.dashboard_data.Humidity;
+            }
+            else if (measurementType == DataObjects.MeasurementType.Humidity)
+            {
+                measurement.Value = device.dashboard_data.Humidity;
                 measurement.Type = DataObjects.MeasurementType.Humidity;
             }
-            else if (measurementType == DataObjects.MeasurementType.CO2){
-                measurement.Value = (float)device.dashboard_data.CO2;
+            else if (measurementType == DataObjects.MeasurementType.CO2)
+            {
+                measurement.Value = device.dashboard_data.CO2;
                 measurement.Type = DataObjects.MeasurementType.CO2;
             }
 
@@ -90,9 +87,6 @@ namespace TempyWorker
             measurement.Source.Location = $"{device.place.city}, {device.place.country}";
 
             return measurement;
-
-        
-
         }
 
         public static void PostMeasurement(DataObjects.Measurement measurement)
@@ -107,7 +101,5 @@ namespace TempyWorker
             // todo: make the execute async
             client.Execute(request);
         }
-        
-        
     }
 }

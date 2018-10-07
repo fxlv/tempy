@@ -13,7 +13,6 @@ namespace TempyAPI
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
-            
             // TODO: setup logging
             Console.Title = "Tempy API";
             return WebHost.CreateDefaultBuilder(args)
