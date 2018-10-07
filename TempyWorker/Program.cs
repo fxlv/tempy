@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Diagnostics;
 using NetatmoLib;
 using Newtonsoft.Json;
 using RestSharp;
@@ -38,6 +39,8 @@ namespace TempyWorker
             // iterates over result
             // for each result:
             // send result to tempy API 
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             Log.Debug("Doing worker run");
 
@@ -48,10 +51,14 @@ namespace TempyWorker
 
             foreach (var device in devices)
             {
+
                 PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
                 PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
                 PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
+
             }
+            stopwatch.Stop();
+            Log.Debug($"Worker run took {stopwatch.Elapsed}");
 
             sleepSeconds = sleepSeconds * 1000;
             Thread.Sleep(sleepSeconds);
