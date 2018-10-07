@@ -107,6 +107,7 @@ namespace TempyWorker
             request.AddParameter("application/json; charset=utf-8", json, ParameterType.RequestBody);
             // todo: make the execute async
             client.Execute(request);
+            // todo: check and return result of the POST query
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TempyAPI.Controllers
 
@@ -7,11 +8,19 @@ namespace TempyAPI.Controllers
     [ApiController]
     public class MeasurementsController : ControllerBase
     {
+
+        private readonly IHostingEnvironment _hostingEnvironment;
+
+        public MeasurementsController(IHostingEnvironment hostingEnvironment){
+            _hostingEnvironment = hostingEnvironment;
+        }
+
         // GET api/measurements
         [HttpGet]
         public JsonResult GetAllMeasurementst()
         {
-            var db = new TempyDB();
+            var s = new Settings(_hostingEnvironment.ContentRootPath);
+            var db = new TempyDB(s);
             var result = db.GetTemperatureMeasurements();
             return new JsonResult(result);
         }
@@ -20,7 +29,9 @@ namespace TempyAPI.Controllers
         [HttpGet("name/{name}")]
         public JsonResult GetLastMeasurement(string name)
         {
-            var db = new TempyDB();
+            var s = new Settings(_hostingEnvironment.ContentRootPath);
+
+            var db = new TempyDB(s);
             var result = db.GetLatestTemperatureMeasurementByName(name);
             return new JsonResult(result);
         }
@@ -29,7 +40,9 @@ namespace TempyAPI.Controllers
         [HttpPost]
         public string Post([FromBody] DataObjects.Measurement measurement)
         {
-            var db = new TempyDB();
+            var s = new Settings(_hostingEnvironment.ContentRootPath);
+
+            var db = new TempyDB(s);
             db.WriteDocument(measurement);
             //todo: return only status code
             return measurement.ToString();

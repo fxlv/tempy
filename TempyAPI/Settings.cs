@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -20,13 +21,16 @@ namespace TempyAPI
     {
         //TODO: use better approach at handling settings, it should not be done here
 
-        //TODO: build settings file path based on environment and test if file exists
-        private readonly string settingsFIle = "/Users/fx/.tempy.settings";
 
-        public Settings()
+        
+        public Settings(string contentRoot)
         {
-            //TODO: test if file exists
-            var rawSettings = File.ReadAllText(settingsFIle);
+            string settingsFileName = ".tempy.settings";
+            string settingsFile = Path.Combine(contentRoot, settingsFileName);
+            if(!File.Exists(settingsFile)){
+                throw new System.IO.FileNotFoundException("Cannot find settings file");
+            }
+            var rawSettings = File.ReadAllText(settingsFile);
 
 
             var parsedSettings = JsonConvert.DeserializeObject<SettingsStore>(rawSettings);
