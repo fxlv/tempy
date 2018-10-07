@@ -29,7 +29,7 @@ namespace NetatmoLib
             LoadAuth();
             if (oauthObject.isValid)
             {
-                Log.Debug("Auth settings loaded from file");
+                Log.Debug("Valid auth settings loaded from file");
             }
             else
             {

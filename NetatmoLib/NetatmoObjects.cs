@@ -95,6 +95,11 @@ namespace NetatmoLib
         public string type { get; set; }
         public List<string> user_owner { get; set; }
         public int wifi_status { get; set; }
+
+        public override string ToString()
+        {
+            return $"Device: {station_name}";
+        }
     }
 
     public class Administrative
