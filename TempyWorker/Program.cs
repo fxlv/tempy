@@ -38,11 +38,16 @@ namespace TempyWorker
         
         
         async public static void  Worker(int sleepSeconds = 300){
-            
-            Log.Debug("doing worker run");
-           
-            
-            
+
+            // do netatmo auth
+            // initializes netatmolib
+            // queries netatmo for data about all sensors
+            // iterates over result
+            // for each result:
+            // send result to tempy API 
+
+            Log.Debug("Doing worker run");
+
             var auth = new NetatmoAuth();
             // for now, run synchronously
             // TODO: change this to run async
@@ -50,46 +55,45 @@ namespace TempyWorker
             
             foreach (var device in devices)
             {
-
-                var temperatureMeasurement = new TempyAPI.DataObjects.TemperatureMeasurement();
-                temperatureMeasurement.Name = device.station_name;
-                temperatureMeasurement.Value = (float) device.dashboard_data.Temperature;
-                temperatureMeasurement.UnixTimestamp = device.last_status_store;
-                temperatureMeasurement.Source = new DataObjects.Source();
-                temperatureMeasurement.Source.Name = device.module_name;
-                temperatureMeasurement.Source.Location = $"{device.place.city}, {device.place.country}";
-                temperatureMeasurement.Source.Type =  DataObjects.SourceType.Temperature;
-                
-                var humidityMeasurement = new TempyAPI.DataObjects.HumidityMeasurement();
-                humidityMeasurement.Name = device.station_name;
-                humidityMeasurement.Value = (float) device.dashboard_data.Humidity;
-                humidityMeasurement.UnixTimestamp = device.last_status_store;
-                humidityMeasurement.Source = new DataObjects.Source();
-                humidityMeasurement.Source.Name = device.module_name;
-                humidityMeasurement.Source.Location = $"{device.place.city}, {device.place.country}";
-                humidityMeasurement.Source.Type = DataObjects.SourceType.Humidity;
-                
-                
-              
-                PostMeasurement(temperatureMeasurement);
-                PostMeasurement(humidityMeasurement);
-
-         
-                
-
-
+                PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
+                PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
+                PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
             }
-            // do netatmo auth
-            // initializes netatmolib
-            // queries netatmo for data about all sensors
-            // iterates over result
-            // for each result:
-            // send result to tempy API 
+           
             sleepSeconds = sleepSeconds * 1000;
             Thread.Sleep(sleepSeconds);
 
         }
 
+        public static DataObjects.Measurement AssembleMeasurement(Device device, DataObjects.MeasurementType measurementType)
+        {
+            Log.Debug($"Assembling {measurementType} measurement for device {device}");
+            var measurement = new TempyAPI.DataObjects.Measurement();
+
+            if(measurementType == DataObjects.MeasurementType.Temperature){
+                measurement.Value = (float)device.dashboard_data.Temperature;
+                measurement.Type = DataObjects.MeasurementType.Temperature;
+            } else if (measurementType == DataObjects.MeasurementType.Humidity){
+                measurement.Value = (float)device.dashboard_data.Humidity;
+                measurement.Type = DataObjects.MeasurementType.Humidity;
+            }
+            else if (measurementType == DataObjects.MeasurementType.CO2){
+                measurement.Value = (float)device.dashboard_data.CO2;
+                measurement.Type = DataObjects.MeasurementType.CO2;
+            }
+
+            measurement.Name = device.station_name;
+            measurement.UnixTimestamp = device.last_status_store;
+            //todo: move this to constructor of the object?
+            measurement.Source = new DataObjects.Source();
+            measurement.Source.Name = device.module_name;
+            measurement.Source.Location = $"{device.place.city}, {device.place.country}";
+
+            return measurement;
+
+        
+
+        }
 
         public static void PostMeasurement(DataObjects.Measurement measurement)
         {
