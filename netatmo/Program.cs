@@ -65,6 +65,9 @@ namespace NetatmoCLI
         /// </summary>
         public static void DisplayDevice(Device device)
         {
+            //todo: check last updated time for all modules, not just the base station
+            // as it is quite possible that a module has been disconnected and this should be clearly
+            // stated in such case
             var lastUpdateString = DateTimeOps.GetLastUpdateString(device.last_status_store);
             Console.WriteLine($"{device.station_name} (updated {lastUpdateString} ago)");
             Console.WriteLine(
