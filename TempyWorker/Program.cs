@@ -51,10 +51,17 @@ namespace TempyWorker
 
             foreach (var device in devices)
             {
-
-                PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
-                PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
-                PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
+                if (NetatmoLib.DateTimeOps.IsDataFresh(device.last_status_store))
+                {
+                    PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
+                    PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
+                    PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
+                }
+                else
+                {
+                    Log.Warning($"Data from device: {device} is more than 20 minutes old. Skipping.");
+                }
+               
 
             }
             stopwatch.Stop();
@@ -68,6 +75,11 @@ namespace TempyWorker
             DataObjects.MeasurementType measurementType)
         {
             Log.Debug($"Assembling {measurementType} measurement for device {device}");
+
+            if (device.dashboard_data == null)
+            {
+                Log.Warning($"Device: {device} contains empty measurements. Old data?");
+            }
             var measurement = new DataObjects.Measurement();
 
             if (measurementType == DataObjects.MeasurementType.Temperature)
