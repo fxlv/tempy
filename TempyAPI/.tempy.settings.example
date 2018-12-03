@@ -1,0 +1,6 @@
+{
+    "DocumentDBEndpointUri": "https://YOURDBURLHERE.documents.azure.com:443/",
+    "DocumentDBPrimaryKey": "primary key here",
+    "DocumentDBDatabaseId": "Measurements",
+    "DocumentDBCollectionId": "TemperatureMeasurements"
+}
