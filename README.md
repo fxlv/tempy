@@ -1,18 +1,15 @@
 # Tempy
 Store and display weather data
 
+
+The project consists of 4 components:
+
+- NetatmoLib is the library that is used to communicate with the netatmo API
+- NetatmoCLI is the CLI tool that show the temperature status
+- TempyAPI is as web API that talks to CosmosDB to retrieve and store temperature measurements
+- TempyWorker runs in a loop and collects data from NetatmoAPI using the netatmolib and posts it to the TempyAPI
+
 ## Setting up
-clone the git repo, then in the cloned directory do
-```
-npm install
-```
-This will download all the dependencies.
 
-Now you can try running the ```start.sh``` script and see what happens :)
+...
 
-## Populating the weather data
-Update temperature using curl like so
-
-```
-curl -XPOST http://tempy.hostname.here/add -d 'sensor=sensor_name_here&temperature=temperature_reading'
-```
