@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetatmoCLI", "netatmo\NetatmoCLI.csproj", "{01D3627C-C760-469C-93D4-92B3AD762F1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetatmoCLI", "NetatmoCLI\NetatmoCLI.csproj", "{01D3627C-C760-469C-93D4-92B3AD762F1C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetatmoLib", "NetatmoLib\NetatmoLib.csproj", "{3AF28586-0612-45F7-AD2B-547268990AA6}"
 EndProject
