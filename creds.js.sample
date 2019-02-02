@@ -1,7 +1,0 @@
-var creds = {};
-
-// only the mongodb address is here (for now)
-creds.mongodb_uri = "mongodb://your.mongodb.hostname/temperature";
-
-
-module.exports = creds;
