@@ -1,0 +1,6 @@
+{
+    "DocumentDBEndpointUri": "https://tempydb.documents.azure.com:443/",
+    "DocumentDBPrimaryKey": "C6TP9JF4refzbcu748VUwb0OO9KieJ3dUwOUrZl4U9SpuWJcQhUNJQ5zqQsX7udTFGX3MAiXuZr6ov0m3rV6sg==",
+    "DocumentDBDatabaseId": "Measurements",
+    "DocumentDBCollectionId": "TemperatureMeasurements"
+}

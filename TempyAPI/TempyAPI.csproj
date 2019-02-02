@@ -10,12 +10,13 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.Azure.DocumentDB.Core">
-          <Version>2.0.0-preview2</Version>
+        <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.0.0-preview2">
         </PackageReference>
-        <PackageReference Include="Newtonsoft.Json">
-          <Version>11.0.2</Version>
+        <PackageReference Include="Newtonsoft.Json" Version="11.0.2">
         </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="1" />
+    </ItemGroup>
 </Project>

@@ -10,9 +10,8 @@ namespace TempyAPI
         private readonly DocumentClient client;
         private readonly Uri collectionUri;
 
-        public TempyDB()
+        public TempyDB(Settings settings)
         {
-            settings = new Settings();
             client = new DocumentClient(new Uri(settings.DocumentDBEndpointUri), settings.DocumentDBPrimaryKey);
             collectionUri =
                 UriFactory.CreateDocumentCollectionUri(settings.DocumentDBDatabaseId, settings.DocumentDBCollectionId);
