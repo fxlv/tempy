@@ -1,11 +1,18 @@
 ﻿using System;
+using System.Collections;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CommandLine;
 using NetatmoLib;
 using Serilog;
 using Serilog.Events;
+using System.Configuration;
+using System.Linq;
 using Serilog.Sinks.SystemConsole.Themes;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Binder;
+using Microsoft.Extensions.Configuration.EnvironmentVariables;
 
 namespace NetatmoCLI
 {
@@ -14,6 +21,8 @@ namespace NetatmoCLI
         [Option('l', "loop", Required = false, HelpText = "Refresh temperature data continuously in a loop.")]
         public bool Loop { get; set; }
     }
+
+    
 
     internal class Program
     {
@@ -27,7 +36,7 @@ namespace NetatmoCLI
                 Log.Fatal($"ERROR: {msg}");
             Environment.Exit(1);
         }
-
+        public static IConfigurationRoot Configuration { get; set; }
         private static async Task Main(string[] args)
         {
             // Set up logging
@@ -36,7 +45,18 @@ namespace NetatmoCLI
             // TODO: Get log file path from a configuration
             Log.Debug("Logging started");
             Console.Title = "NetatmoCLI";
-            var netAuth = new NetatmoAuth();
+            
+            // set up configuration
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
+
+            var netatmoCreds = new NetatmoApiAuthCredentials();
+            Configuration.GetSection("netatmo_api_auth").Bind(netatmoCreds);
+            
+            var netAuth = new NetatmoAuth(netatmoCreds);
 
             var options = new Options();
             // Parse arguments using CommandLine module
