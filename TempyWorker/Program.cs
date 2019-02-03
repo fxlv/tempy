@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Diagnostics;
+using System.IO;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Configuration.Binder;
+
 using NetatmoLib;
 using Newtonsoft.Json;
 using RestSharp;
@@ -13,6 +19,8 @@ namespace TempyWorker
 {
     internal class Program
     {
+        public static IConfigurationRoot Configuration { get; set; }
+
         private static void Main(string[] args)
         {
             // initialize logging
@@ -21,17 +29,28 @@ namespace TempyWorker
                 .WriteTo.File("worker.log", rollingInterval: RollingInterval.Day).CreateLogger();
             Log.Debug("logging started");
             Console.Title = "Tempy Worker";
-            WorkerRunner();
+            
+            // set up configuration
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
+            
+            var netatmoCreds = new NetatmoApiAuthCredentials();
+            Configuration.GetSection("netatmo_api_auth").Bind(netatmoCreds);
+                        
+            WorkerRunner(netatmoCreds);
             // go into loop and constantly (configurable sleep interval) call worker()
         }
 
-        public static void WorkerRunner()
+        public static void WorkerRunner(NetatmoApiAuthCredentials netatmoCreds)
         {
-            while (true) Worker();
+            while (true) Worker(netatmoCreds);
         }
 
 
-        public static async void Worker(int sleepSeconds = 300)
+        public static async void Worker(NetatmoApiAuthCredentials netatmoCreds, int sleepSeconds = 300)
         {
             // do netatmo auth
             // initializes netatmolib
@@ -44,7 +63,7 @@ namespace TempyWorker
 
             Log.Debug("Doing worker run");
 
-            var auth = new NetatmoAuth();
+            var auth = new NetatmoAuth(netatmoCreds);
             // for now, run synchronously
             // TODO: change this to run async
             var devices = NetatmoQueries.GetTempAsync(auth.GetToken()).GetAwaiter().GetResult();
