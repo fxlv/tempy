@@ -93,8 +93,18 @@ namespace NetatmoCLI
             Console.WriteLine(
                 $" Sensor: {device.module_name}, temperature: {device.dashboard_data.Temperature}");
             foreach (var module in device.modules)
-                Console.WriteLine(
-                    $" Sensor: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
+            {
+                if (module.reachable)
+                {
+                    Console.WriteLine(
+                        $" Sensor: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
+                }
+                else
+                {
+                    Console.WriteLine($" Sensor: {module.module_name} is unreachable.");
+                }
+            }
+                
         }
 
         /// <summary>
