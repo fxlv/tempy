@@ -8,6 +8,14 @@ using Serilog;
 
 namespace NetatmoLib
 {
+    public class NetatmoApiAuthCredentials
+    {
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+       
+    }
     /// <summary>
     ///     Authentication class takes care of logging in to Netatmo
     ///     acquiring the Oauth token and saving it for re-use.
@@ -23,7 +31,7 @@ namespace NetatmoLib
         ///     Constructor takes care of the business logic of
         ///     loading the saved authentication state and doing a re-auth if necessary.
         /// </summary>
-        public NetatmoAuth()
+        public NetatmoAuth(NetatmoApiAuthCredentials netatmoCreds)
         {
             oauthObject = new OauthResponseObject();
             LoadAuth();
@@ -34,7 +42,7 @@ namespace NetatmoLib
             else
             {
                 Log.Debug("Loaded auth settings were not valid. Will re-authenticate.");
-                DoAuth();
+                DoAuth(netatmoCreds);
                 SaveAuth();
             }
 
@@ -118,40 +126,15 @@ namespace NetatmoLib
         ///     Do oAuth authentication using locally stored credentials
         ///     against Netatmo oAuth API
         /// </summary>
-        private void DoAuth()
+        private void DoAuth(NetatmoApiAuthCredentials netatmoCreds)
         {
-            var settingsFile = "appsettings.json";
-            try
-            {
-                var builder = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile(settingsFile);
-
-                Configuration = builder.Build();
-            }
-            catch (FormatException)
-            {
-                Log.Error($"Could not read '{settingsFile}'. Exiting.");
-                Environment.Exit(1);
-            }
-            catch (FileNotFoundException)
-            {
-                Log.Error($"Settings file '{settingsFile}' not found. Exiting.");
-                Environment.Exit(0);
-            }
-            catch (Exception e)
-            {
-                Log.Error($"Unexpected exception {e}");
-                Environment.Exit(1);
-            }
-
             var client = new RestClient("https://api.netatmo.com");
             client.Authenticator =
-                new HttpBasicAuthenticator(Configuration["client_id"], Configuration["client_secret"]);
+                new HttpBasicAuthenticator(netatmoCreds.ClientId, netatmoCreds.ClientSecret);
             var request = new RestRequest("oauth2/token", Method.POST);
             request.AddParameter("grant_type", "password");
-            request.AddParameter("username", Configuration["username"]);
-            request.AddParameter("password", Configuration["password"]);
+            request.AddParameter("username", netatmoCreds.Username);
+            request.AddParameter("password", netatmoCreds.Password);
 
             Log.Debug("Making the request to Netatmo API");
             var response = client.Execute(request);
