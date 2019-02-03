@@ -56,6 +56,7 @@ namespace NetatmoLib
         public int last_message { get; set; }
         public int last_seen { get; set; }
         public int last_setup { get; set; }
+        public bool reachable { get; set; }
         public string module_name { get; set; }
         public int rf_status { get; set; }
         public string type { get; set; }
