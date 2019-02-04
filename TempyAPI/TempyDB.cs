@@ -11,7 +11,7 @@ namespace TempyAPI
         public string DocumentDBDatabaseId { get; set; }
         public string DocumentDBCollectionId { get; set; }
     }
-    
+
     public class TempyDB
     {
         private readonly DocumentClient client;
@@ -19,9 +19,11 @@ namespace TempyAPI
 
         public TempyDB(TempyDbAuthCredentials authCredentials)
         {
-            client = new DocumentClient(new Uri(authCredentials.DocumentDBEndpointUri), authCredentials.DocumentDBPrimaryKey);
+            client = new DocumentClient(new Uri(authCredentials.DocumentDBEndpointUri),
+                authCredentials.DocumentDBPrimaryKey);
             collectionUri =
-                UriFactory.CreateDocumentCollectionUri(authCredentials.DocumentDBDatabaseId, authCredentials.DocumentDBCollectionId);
+                UriFactory.CreateDocumentCollectionUri(authCredentials.DocumentDBDatabaseId,
+                    authCredentials.DocumentDBCollectionId);
         }
 
         public void WriteDocument(DataObjects.Measurement measurement)

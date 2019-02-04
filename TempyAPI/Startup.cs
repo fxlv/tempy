@@ -19,10 +19,9 @@ namespace TempyAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            TempyDbAuthCredentials cosmosDbAuthSettings = new TempyDbAuthCredentials();
-            Configuration.Bind("CosmosDbAuthSettings",cosmosDbAuthSettings);
+            var cosmosDbAuthSettings = new TempyDbAuthCredentials();
+            Configuration.Bind("CosmosDbAuthSettings", cosmosDbAuthSettings);
             services.AddSingleton(cosmosDbAuthSettings);
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,7 +37,6 @@ namespace TempyAPI
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
                 app.UseHttpsRedirection();
-                
             }
 
             app.UseMvc();

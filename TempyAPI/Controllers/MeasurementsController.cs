@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -10,16 +9,15 @@ namespace TempyAPI.Controllers
     [ApiController]
     public class MeasurementsController : ControllerBase
     {
+        private readonly TempyDbAuthCredentials _cosmosDbAuthSettings;
 
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly TempyDbAuthCredentials _cosmosDbAuthSettings;
-        
-        public MeasurementsController(IHostingEnvironment hostingEnvironment, IConfiguration  configuration, TempyDbAuthCredentials cosmosDbAuthSettings){
+
+        public MeasurementsController(IHostingEnvironment hostingEnvironment, IConfiguration configuration,
+            TempyDbAuthCredentials cosmosDbAuthSettings)
+        {
             _hostingEnvironment = hostingEnvironment;
             _cosmosDbAuthSettings = cosmosDbAuthSettings;
-
-
-
         }
 
         // GET api/measurements
@@ -36,7 +34,6 @@ namespace TempyAPI.Controllers
         [HttpGet("name/{name}")]
         public JsonResult GetLastMeasurement(string name)
         {
-
             var db = new TempyDB(_cosmosDbAuthSettings);
             var result = db.GetLatestTemperatureMeasurementByName(name);
             return new JsonResult(result);
@@ -46,7 +43,6 @@ namespace TempyAPI.Controllers
         [HttpPost]
         public string Post([FromBody] DataObjects.Measurement measurement)
         {
-
             var db = new TempyDB(_cosmosDbAuthSettings);
             db.WriteDocument(measurement);
             //todo: return only status code
