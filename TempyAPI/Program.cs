@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace TempyAPI
 {
@@ -11,12 +12,19 @@ namespace TempyAPI
             CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
-        {
-            // TODO: setup logging
-            Console.Title = "Tempy API";
-            return WebHost.CreateDefaultBuilder(args)
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    // Call additional providers here as needed.
+                    // Call AddEnvironmentVariables last if you need to allow environment
+                    // variables to override values from other providers.
+                    config.AddEnvironmentVariables(prefix: "SETTINGS_");
+                    config.AddJsonFile("appsettings.json");
+
+
+                })
                 .UseStartup<Startup>();
-        }
+
     }
 }

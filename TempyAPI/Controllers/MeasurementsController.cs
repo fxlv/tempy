@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace TempyAPI.Controllers
 
@@ -10,17 +12,22 @@ namespace TempyAPI.Controllers
     {
 
         private readonly IHostingEnvironment _hostingEnvironment;
-
-        public MeasurementsController(IHostingEnvironment hostingEnvironment){
+        private readonly TempyDbAuthCredentials _cosmosDbAuthSettings;
+        
+        public MeasurementsController(IHostingEnvironment hostingEnvironment, IConfiguration  configuration, TempyDbAuthCredentials cosmosDbAuthSettings){
             _hostingEnvironment = hostingEnvironment;
+            _cosmosDbAuthSettings = cosmosDbAuthSettings;
+
+
+
         }
 
         // GET api/measurements
         [HttpGet]
         public JsonResult GetAllMeasurementst()
         {
-            var s = new Settings(_hostingEnvironment.ContentRootPath);
-            var db = new TempyDB(s);
+            //TODO: don't create a new cosmosdb connection every time
+            var db = new TempyDB(_cosmosDbAuthSettings);
             var result = db.GetTemperatureMeasurements();
             return new JsonResult(result);
         }
@@ -29,9 +36,8 @@ namespace TempyAPI.Controllers
         [HttpGet("name/{name}")]
         public JsonResult GetLastMeasurement(string name)
         {
-            var s = new Settings(_hostingEnvironment.ContentRootPath);
 
-            var db = new TempyDB(s);
+            var db = new TempyDB(_cosmosDbAuthSettings);
             var result = db.GetLatestTemperatureMeasurementByName(name);
             return new JsonResult(result);
         }
@@ -40,9 +46,8 @@ namespace TempyAPI.Controllers
         [HttpPost]
         public string Post([FromBody] DataObjects.Measurement measurement)
         {
-            var s = new Settings(_hostingEnvironment.ContentRootPath);
 
-            var db = new TempyDB(s);
+            var db = new TempyDB(_cosmosDbAuthSettings);
             db.WriteDocument(measurement);
             //todo: return only status code
             return measurement.ToString();

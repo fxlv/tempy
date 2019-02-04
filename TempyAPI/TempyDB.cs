@@ -4,17 +4,24 @@ using Microsoft.Azure.Documents.Client;
 
 namespace TempyAPI
 {
+    public class TempyDbAuthCredentials
+    {
+        public string DocumentDBEndpointUri { get; set; }
+        public string DocumentDBPrimaryKey { get; set; }
+        public string DocumentDBDatabaseId { get; set; }
+        public string DocumentDBCollectionId { get; set; }
+    }
+    
     public class TempyDB
     {
-        private readonly Settings settings;
         private readonly DocumentClient client;
         private readonly Uri collectionUri;
 
-        public TempyDB(Settings settings)
+        public TempyDB(TempyDbAuthCredentials authCredentials)
         {
-            client = new DocumentClient(new Uri(settings.DocumentDBEndpointUri), settings.DocumentDBPrimaryKey);
+            client = new DocumentClient(new Uri(authCredentials.DocumentDBEndpointUri), authCredentials.DocumentDBPrimaryKey);
             collectionUri =
-                UriFactory.CreateDocumentCollectionUri(settings.DocumentDBDatabaseId, settings.DocumentDBCollectionId);
+                UriFactory.CreateDocumentCollectionUri(authCredentials.DocumentDBDatabaseId, authCredentials.DocumentDBCollectionId);
         }
 
         public void WriteDocument(DataObjects.Measurement measurement)
