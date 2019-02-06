@@ -1,0 +1,8 @@
+{
+  "netatmo_api_auth": {
+    "ClientId": "netatmo client id",
+    "ClientSecret": "client secret",
+    "Username": "your username",
+    "Password": "password"
+  }
+}
