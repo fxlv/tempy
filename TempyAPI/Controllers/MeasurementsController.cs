@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace TempyAPI.Controllers
 
@@ -27,6 +28,7 @@ namespace TempyAPI.Controllers
             //TODO: don't create a new cosmosdb connection every time
             var db = new TempyDB(_cosmosDbAuthSettings);
             var result = db.GetTemperatureMeasurements();
+            Log.Debug($"Status: {Response.StatusCode} Remote IP: {HttpContext.Connection.RemoteIpAddress} Path: {HttpContext.Request.Path} ");
             return new JsonResult(result);
         }
 
@@ -36,6 +38,8 @@ namespace TempyAPI.Controllers
         {
             var db = new TempyDB(_cosmosDbAuthSettings);
             var result = db.GetLatestTemperatureMeasurementByName(name);
+            Log.Debug($"Status: {Response.StatusCode} Remote IP: {HttpContext.Connection.RemoteIpAddress} Path: {HttpContext.Request.Path} ");
+
             return new JsonResult(result);
         }
 
@@ -46,6 +50,8 @@ namespace TempyAPI.Controllers
             var db = new TempyDB(_cosmosDbAuthSettings);
             db.WriteDocument(measurement);
             //todo: return only status code
+            Log.Debug($"Status: {Response.StatusCode} Remote IP: {HttpContext.Connection.RemoteIpAddress} Path: {HttpContext.Request.Path} ");
+
             return measurement.ToString();
         }
     }

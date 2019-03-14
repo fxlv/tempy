@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace TempyAPI
 {
@@ -8,6 +11,12 @@ namespace TempyAPI
     {
         public static void Main(string[] args)
         {
+            // initialize logging
+            Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo
+                .Console(LogEventLevel.Information, theme: ConsoleTheme.None)
+                .WriteTo.File("api.log", rollingInterval: RollingInterval.Day).CreateLogger();
+            Log.Debug("logging started");
+            
             CreateWebHostBuilder(args).Build().Run();
         }
 
