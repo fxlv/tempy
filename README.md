@@ -31,5 +31,9 @@ dotnet test
 
 ## Running
 
-...
+
+```
+docker run -t -p 5000:5000 -i tempy.api:latest
+docker run -e TEMPY_API_TARGET=${DOCKER_IP}:5000 -t -i tempy.worker:latest
+```
 
