@@ -39,18 +39,22 @@ namespace TempyWorker
             
             var netatmoCreds = new NetatmoApiAuthCredentials();
             Configuration.GetSection("netatmo_api_auth").Bind(netatmoCreds);
-                        
-            WorkerRunner(netatmoCreds);
+            var tempyApiTarget = Environment.GetEnvironmentVariable("TEMPY_API_TARGET");
+            if (tempyApiTarget == null)
+            {
+                tempyApiTarget = "localhost:5000";
+            }
+            WorkerRunner(netatmoCreds, tempyApiTarget);
             // go into loop and constantly (configurable sleep interval) call worker()
         }
 
-        public static void WorkerRunner(NetatmoApiAuthCredentials netatmoCreds)
+        public static void WorkerRunner(NetatmoApiAuthCredentials netatmoCreds, string tempyApiTarget)
         {
-            while (true) Worker(netatmoCreds);
+            while (true) Worker(netatmoCreds, tempyApiTarget);
         }
 
 
-        public static async void Worker(NetatmoApiAuthCredentials netatmoCreds, int sleepSeconds = 300)
+        public static async void Worker(NetatmoApiAuthCredentials netatmoCreds, string tempyApiTarget, int sleepSeconds = 300)
         {
             // do netatmo auth
             // initializes netatmolib
@@ -72,9 +76,9 @@ namespace TempyWorker
             {
                 if (NetatmoLib.DateTimeOps.IsDataFresh(device.last_status_store))
                 {
-                    PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
-                    PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
-                    PostMeasurement(AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
+                    PostMeasurement(tempyApiTarget,AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
+                    PostMeasurement(tempyApiTarget,AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
+                    PostMeasurement(tempyApiTarget,AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
                 }
                 else
                 {
@@ -127,13 +131,14 @@ namespace TempyWorker
             return measurement;
         }
 
-        public static void PostMeasurement(DataObjects.Measurement measurement)
+        public static void PostMeasurement(string tempyApiTarget,DataObjects.Measurement measurement)
         {
             var client = new RestClient();
-            client.BaseUrl = new Uri("http://localhost:5000/");
+            client.BaseUrl = new Uri($"http://{tempyApiTarget}/");
             var request = new RestRequest("api/measurements", Method.POST);
             request.RequestFormat = DataFormat.Json;
             var json = JsonConvert.SerializeObject(measurement);
+            Log.Debug($"Posting measurement to {tempyApiTarget}");
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json; charset=utf-8", json, ParameterType.RequestBody);
             // todo: make the execute async
