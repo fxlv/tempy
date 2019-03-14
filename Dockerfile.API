@@ -1,0 +1,13 @@
+FROM microsoft/dotnet
+MAINTAINER Kaspars Mickevics (kaspars@fx.lv)
+COPY . /tempy
+WORKDIR /tempy
+#RUN ./clean.sh
+RUN dotnet clean
+RUN dotnet restore
+RUN dotnet build
+RUN dotnet test
+WORKDIR /tempy/TempyAPI
+EXPOSE 5000
+LABEL tempy_component=api
+CMD [ "./start.sh" ]
