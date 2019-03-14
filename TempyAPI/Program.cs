@@ -21,8 +21,10 @@ namespace TempyAPI
                     // variables to override values from other providers.
                     config.AddEnvironmentVariables("SETTINGS_");
                     config.AddJsonFile("appsettings.json");
+                    
                 })
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .UseUrls("http://*:5000");
         }
     }
 }
