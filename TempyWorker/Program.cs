@@ -31,9 +31,8 @@ namespace TempyWorker
 
     public class Worker
     {
-        public NetatmoApiAuthCredentials GetNetatmoApiAuthCredentials()
+        public NetatmoApiAuthCredentials GetNetatmoApiAuthCredentials(IConfigurationRoot configuration)
         {
-            var configuration = GetConfigurationRoot();
             // instantiate netatmoCreds object that will keep our credentials
             var netatmoCreds = new NetatmoApiAuthCredentials();
             // populate the credentials from the configuration
@@ -42,12 +41,13 @@ namespace TempyWorker
         }
 
 
-        public IConfigurationRoot GetConfigurationRoot()
+        public IConfigurationRoot GetConfigurationRoot(string configDirectory = null)
         {
             // set up configuration
             IConfigurationRoot configuration;
+            if (configDirectory == null) configDirectory = Directory.GetCurrentDirectory();
             var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(configDirectory)
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables();
             configuration = builder.Build();
@@ -57,7 +57,8 @@ namespace TempyWorker
 
         public void Run()
         {
-            var netatmoCreds = GetNetatmoApiAuthCredentials();
+            var configuration = GetConfigurationRoot();
+            var netatmoCreds = GetNetatmoApiAuthCredentials(configuration);
 
             var tempyApiTarget = Environment.GetEnvironmentVariable("TEMPY_API_TARGET");
             if (tempyApiTarget == null) tempyApiTarget = "localhost:5000";
