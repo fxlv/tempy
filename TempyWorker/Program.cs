@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Threading;
 using System.Diagnostics;
 using System.IO;
-
+using System.Threading;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
-using Microsoft.Extensions.Configuration.Binder;
-
 using NetatmoLib;
 using Newtonsoft.Json;
 using RestSharp;
@@ -17,10 +13,8 @@ using TempyAPI;
 
 namespace TempyWorker
 {
-    internal class Program
+    public class Program
     {
-        public static IConfigurationRoot Configuration { get; set; }
-
         private static void Main(string[] args)
         {
             // initialize logging
@@ -29,32 +23,52 @@ namespace TempyWorker
                 .WriteTo.File("worker.log", rollingInterval: RollingInterval.Day).CreateLogger();
             Log.Debug("logging started");
             Console.Title = "Tempy Worker";
-            
+
+            var w = new Worker();
+            w.Run();
+        }
+    }
+
+    public class Worker
+    {
+        public NetatmoApiAuthCredentials GetNetatmoApiAuthCredentials()
+        {
+            var configuration = GetConfigurationRoot();
+            // instantiate netatmoCreds object that will keep our credentials
+            var netatmoCreds = new NetatmoApiAuthCredentials();
+            // populate the credentials from the configuration
+            configuration.GetSection("netatmo_api_auth").Bind(netatmoCreds);
+            return netatmoCreds;
+        }
+
+
+        public IConfigurationRoot GetConfigurationRoot()
+        {
             // set up configuration
+            IConfigurationRoot configuration;
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables();
-            Configuration = builder.Build();
-            
-            var netatmoCreds = new NetatmoApiAuthCredentials();
-            Configuration.GetSection("netatmo_api_auth").Bind(netatmoCreds);
-            var tempyApiTarget = Environment.GetEnvironmentVariable("TEMPY_API_TARGET");
-            if (tempyApiTarget == null)
-            {
-                tempyApiTarget = "localhost:5000";
-            }
-            WorkerRunner(netatmoCreds, tempyApiTarget);
-            // go into loop and constantly (configurable sleep interval) call worker()
+            configuration = builder.Build();
+            return configuration;
         }
 
-        public static void WorkerRunner(NetatmoApiAuthCredentials netatmoCreds, string tempyApiTarget)
+
+        public void Run()
         {
-            while (true) Worker(netatmoCreds, tempyApiTarget);
+            var netatmoCreds = GetNetatmoApiAuthCredentials();
+
+            var tempyApiTarget = Environment.GetEnvironmentVariable("TEMPY_API_TARGET");
+            if (tempyApiTarget == null) tempyApiTarget = "localhost:5000";
+
+            // go into loop and constantly (configurable sleep interval) call worker()
+            while (true) WorkerRunner(netatmoCreds, tempyApiTarget);
         }
 
 
-        public static async void Worker(NetatmoApiAuthCredentials netatmoCreds, string tempyApiTarget, int sleepSeconds = 300)
+        public async void WorkerRunner(NetatmoApiAuthCredentials netatmoCreds, string tempyApiTarget,
+            int sleepSeconds = 300)
         {
             // do netatmo auth
             // initializes netatmolib
@@ -73,20 +87,18 @@ namespace TempyWorker
             var devices = NetatmoQueries.GetTempAsync(auth.GetToken()).GetAwaiter().GetResult();
 
             foreach (var device in devices)
-            {
-                if (NetatmoLib.DateTimeOps.IsDataFresh(device.last_status_store))
+                if (DateTimeOps.IsDataFresh(device.last_status_store))
                 {
-                    PostMeasurement(tempyApiTarget,AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
-                    PostMeasurement(tempyApiTarget,AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
-                    PostMeasurement(tempyApiTarget,AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
+                    PostMeasurement(tempyApiTarget,
+                        AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
+                    PostMeasurement(tempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
+                    PostMeasurement(tempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
                 }
                 else
                 {
                     Log.Warning($"Data from device: {device} is more than 20 minutes old. Skipping.");
                 }
-               
 
-            }
             stopwatch.Stop();
             Log.Debug($"Worker run took {stopwatch.Elapsed}");
 
@@ -94,15 +106,12 @@ namespace TempyWorker
             Thread.Sleep(sleepSeconds);
         }
 
-        public static DataObjects.Measurement AssembleMeasurement(Device device,
+        public DataObjects.Measurement AssembleMeasurement(Device device,
             DataObjects.MeasurementType measurementType)
         {
             Log.Debug($"Assembling {measurementType} measurement for device {device}");
 
-            if (device.dashboard_data == null)
-            {
-                Log.Warning($"Device: {device} contains empty measurements. Old data?");
-            }
+            if (device.dashboard_data == null) Log.Warning($"Device: {device} contains empty measurements. Old data?");
             var measurement = new DataObjects.Measurement();
 
             if (measurementType == DataObjects.MeasurementType.Temperature)
@@ -131,7 +140,7 @@ namespace TempyWorker
             return measurement;
         }
 
-        public static void PostMeasurement(string tempyApiTarget,DataObjects.Measurement measurement)
+        public void PostMeasurement(string tempyApiTarget, DataObjects.Measurement measurement)
         {
             var client = new RestClient();
             client.BaseUrl = new Uri($"http://{tempyApiTarget}/");
