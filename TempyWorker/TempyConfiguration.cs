@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using Microsoft.Extensions.Configuration;
+using Serilog.Configuration;
 
 namespace TempyWorker
 {
@@ -73,12 +74,34 @@ namespace TempyWorker
             configuration = builder.Build();
             return configuration;
         }
-        
+
+        /// <summary>
+        /// Validate theat the values in logging config are not null.
+        /// </summary>
+        /// <param name="loggingConfig"></param>
+        /// <returns></returns>
+        public bool IsValidLoggingConfig(LoggingConfig loggingConfig)
+        {
+
+            if (loggingConfig.LogDirectory == null || loggingConfig.LogFileName == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
         public LoggingConfig GetLoggingConfig()
         {
-            var loggingConfig = new LoggingConfig();
-            ConfigurationRoot.GetSection("logging").Bind(loggingConfig);
-            return loggingConfig;
+           var loggingConfig = new LoggingConfig();
+           ConfigurationRoot.GetSection("logging").Bind(loggingConfig);
+            if (IsValidLoggingConfig(loggingConfig))
+            {
+                return loggingConfig;
+            }
+            else
+            {
+                throw new Exception("Invalid logging config provided!");
+            }
         }
 
     }
