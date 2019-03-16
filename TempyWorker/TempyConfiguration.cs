@@ -49,6 +49,8 @@ namespace TempyWorker
         public bool IsValidJsonFile(string fileName)
         {
             string content = System.IO.File.ReadAllText(fileName);
+            // trim whitespace from both ends
+            content = content.Trim();
             if (content.StartsWith("{"))
             {
                 if (content.EndsWith("}"))
