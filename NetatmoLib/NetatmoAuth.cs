@@ -92,15 +92,20 @@ namespace NetatmoLib
                     oauthObject = JsonConvert.DeserializeObject<OauthResponseObject>(contents);
                     Log.Debug($"Timestamp now: {timestampNow}, timestam from file: {oauthObject.timestamp}");
                     var timestampDelta = timestampNow - oauthObject.timestamp;
-                    if (timestampDelta <= 10700)
+                    oauthObject.isValid = false; // it is not valid until proven othervise
+                    if (oauthObject.access_token == null)
                     {
-                        Log.Debug($"We seem to have a valid auth token. Delta is {timestampDelta} seconds");
-                        oauthObject.isValid = true;
+                        Log.Warning("The access token from 'authsettings.bin' contains a null auth token.");
                     }
                     else
                     {
-                        oauthObject.isValid = false;
+                        if (timestampDelta <= 10700)
+                        {
+                            Log.Debug($"We seem to have a valid auth token. Delta is {timestampDelta} seconds");
+                            oauthObject.isValid = true;
+                        }
                     }
+                   
                 }
                 catch (FileNotFoundException)
                 {
