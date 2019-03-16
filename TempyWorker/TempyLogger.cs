@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Configuration;
-using Serilog;
+﻿using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
@@ -8,32 +6,20 @@ namespace TempyWorker
 {
     public static class TempyLogger
     {
-        
-      
+        /// <summary>
+        ///     Initialize the logger
+        /// </summary>
+        /// <param name="tConfiguration"></param>
         public static void Initilize(TempyConfiguration tConfiguration)
         {
             // initialize logging
 
-            var loggingConfig = GetLoggingConfig(tConfiguration.ConfigurationRoot);
+            var loggingConfig = tConfiguration.GetLoggingConfig();
             Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo
                 .Console(LogEventLevel.Information, theme: ConsoleTheme.None)
                 .WriteTo.File(loggingConfig.LogFileName, rollingInterval: RollingInterval.Day).CreateLogger();
+            Log.Debug($"Using configuration file: {tConfiguration.ConfigurationFile}");
             Log.Debug("Logging initialized");
         }
-
-        public static LoggingConfig GetLoggingConfig(IConfigurationRoot configuration)
-        {
-            var loggingConfig = new LoggingConfig();
-            configuration.GetSection("logging").Bind(loggingConfig);
-            return loggingConfig;
-        }
-    }
-
-
-    public class LoggingConfig
-    {
-        public string LogDirectory { get; set; }
-        public string LogFileName { get; set; }
-
     }
 }
