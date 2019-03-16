@@ -13,5 +13,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NetatmoLib\NetatmoLib.csproj" />
+    <ProjectReference Include="..\TempyWorker\TempyWorker.csproj" />
   </ItemGroup>
 </Project>
