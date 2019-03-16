@@ -86,5 +86,19 @@ namespace TempyWorker.Test
            string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "both_missing"));        
            Assert.Throws<FileNotFoundException>(() => new TempyConfiguration(configFileDirectory));
         }
+
+        /// <summary>
+        /// Validate that in case when logging config is invalid or missing, Tempy throws and exception
+        /// with a clarifying message
+        /// </summary>
+        [Fact]
+        public void InvalidLoggingConfigThrowsException()
+        {
+            
+            string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "logging_config_missing")); 
+            TempyConfiguration tConfiguration = new TempyConfiguration(configFileDirectory);
+
+            Assert.Throws<System.Exception>(() => TempyLogger.Initilize(tConfiguration));
+        }
     }
 }
