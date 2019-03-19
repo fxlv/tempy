@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using Microsoft.Azure.Documents;
 using Microsoft.Extensions.Configuration;
 using Serilog.Configuration;
+using NetatmoLib;
 
 namespace TempyWorker
 {
@@ -16,6 +18,9 @@ namespace TempyWorker
         {
             if (_configDirectory == null)
             {
+                // unless configuration directory was provided to the constructor,
+                // User the current working directory
+                // support for overriding it exists mosty for use during testing
                 ConfigDirectory = Directory.GetCurrentDirectory();
             }
             else
@@ -90,6 +95,16 @@ namespace TempyWorker
 
             return true;
         }
+        
+        public NetatmoApiAuthCredentials GetNetatmoApiAuthCredentials()
+        {
+            // instantiate netatmoCreds object that will keep our credentials
+            var netatmoCreds = new NetatmoApiAuthCredentials();
+            // populate the credentials from the configuration
+            ConfigurationRoot.GetSection("netatmo_api_auth").Bind(netatmoCreds);
+            return netatmoCreds;
+        }
+        
         public LoggingConfig GetLoggingConfig()
         {
            var loggingConfig = new LoggingConfig();

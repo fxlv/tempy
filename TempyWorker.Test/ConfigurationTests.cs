@@ -38,7 +38,8 @@ namespace TempyWorker.Test
         [Fact]
         public void GetNetatmoApiAuthCredentials()
         {
-            var netatmoCreds = Worker.GetNetatmoApiAuthCredentials(Configuration);
+
+            var netatmoCreds = TempyConfiguration.GetNetatmoApiAuthCredentials();
 
             Assert.IsType<string>(netatmoCreds.Username);
             Assert.IsType<string>(netatmoCreds.Password);

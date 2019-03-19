@@ -12,20 +12,13 @@ namespace TempyWorker
 {
     public class Worker
     {
-        public NetatmoApiAuthCredentials GetNetatmoApiAuthCredentials(IConfigurationRoot configuration)
-        {
-            // instantiate netatmoCreds object that will keep our credentials
-            var netatmoCreds = new NetatmoApiAuthCredentials();
-            // populate the credentials from the configuration
-            configuration.GetSection("netatmo_api_auth").Bind(netatmoCreds);
-            return netatmoCreds;
-        }
+        
 
         public void Run()
         {
             var tempyConfiguration = new TempyConfiguration();
             var configuration = tempyConfiguration.GetConfigurationRoot();
-            var netatmoCreds = GetNetatmoApiAuthCredentials(configuration);
+            var netatmoCreds = tempyConfiguration.GetNetatmoApiAuthCredentials();
 
             var tempyApiTarget = Environment.GetEnvironmentVariable("TEMPY_API_TARGET");
             if (tempyApiTarget == null) tempyApiTarget = "localhost:5000";

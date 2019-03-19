@@ -24,7 +24,7 @@ namespace XUnitTestNetatmoLib
             var w = new Worker();
             var tempyConfiguration = new TempyConfiguration(configFileDirectory);
             var configuration = tempyConfiguration.GetConfigurationRoot();
-            var netatmoCreds = w.GetNetatmoApiAuthCredentials(configuration);
+            var netatmoCreds = tempyConfiguration.GetNetatmoApiAuthCredentials();
             var auth = new NetatmoAuth(netatmoCreds);
             // assert that the auth token is not null
             Assert.True(auth.GetToken() != null);

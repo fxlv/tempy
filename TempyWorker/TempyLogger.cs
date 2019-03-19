@@ -19,7 +19,7 @@ namespace TempyWorker
                 .Console(LogEventLevel.Information, theme: ConsoleTheme.None)
                 .WriteTo.File(loggingConfig.LogFileName, rollingInterval: RollingInterval.Day).CreateLogger();
             Log.Debug($"Using configuration file: {tConfiguration.ConfigurationFile}");
-            Log.Debug("Logging initialized");
+            Log.Information("Logging initialized");
         }
     }
 }
