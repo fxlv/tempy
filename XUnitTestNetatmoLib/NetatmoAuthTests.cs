@@ -1,7 +1,6 @@
 using System;
 using NetatmoLib;
 using Xunit;
-using NetatmoLib;
 using TempyWorker;
 using System.IO;
 

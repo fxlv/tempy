@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using Microsoft.Azure.Documents;
 using Microsoft.Extensions.Configuration;
 using Serilog.Configuration;
 using NetatmoLib;
