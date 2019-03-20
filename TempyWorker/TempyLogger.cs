@@ -17,9 +17,9 @@ namespace TempyWorker
             var loggingConfig = tConfiguration.GetLoggingConfig();
             Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo
                 .Console(LogEventLevel.Information, theme: ConsoleTheme.None)
-                .WriteTo.File(loggingConfig.LogFileName, rollingInterval: RollingInterval.Day).CreateLogger();
+                .WriteTo.File(loggingConfig.LogFilePath, rollingInterval: RollingInterval.Day).CreateLogger();
             Log.Debug($"Using configuration file: {tConfiguration.ConfigurationFile}");
-            Log.Information("Logging initialized");
+            Log.Information($"Logging initialized, writing DEBUG logs to {loggingConfig.LogFilePath}");
         }
     }
 }

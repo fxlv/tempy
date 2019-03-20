@@ -125,5 +125,6 @@ namespace TempyWorker
     {
         public string LogDirectory { get; set; }
         public string LogFileName { get; set; }
+        public string LogFilePath => Path.Combine(LogDirectory, LogFileName);
     }
 }
