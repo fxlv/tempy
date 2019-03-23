@@ -12,7 +12,7 @@ namespace TempyWorker
         public IConfigurationRoot ConfigurationRoot { get; set; }
         public string ConfigDirectory { get; set; }
         public string ConfigurationFile { get; set; }
-        
+
         public TempyConfiguration(string _configDirectory = null)
         {
             if (_configDirectory == null)
@@ -26,7 +26,7 @@ namespace TempyWorker
             {
                 ConfigDirectory = _configDirectory;
             }
-            
+
             // find the configuration file
             // in case the primary configuration file is missing, fall back to using appsettings.json.default
             // if neither are present, throw an exception
@@ -37,8 +37,9 @@ namespace TempyWorker
             if (File.Exists(primaryConfigFileName) && IsValidJsonFile(primaryConfigFileName))
             {
                 ConfigurationFile = primaryConfigFileName;
-                
-            } else if (File.Exists(secondaryConfigFileName) && IsValidJsonFile(secondaryConfigFileName))
+
+            }
+            else if (File.Exists(secondaryConfigFileName) && IsValidJsonFile(secondaryConfigFileName))
             {
                 ConfigurationFile = secondaryConfigFileName;
             }
@@ -46,7 +47,7 @@ namespace TempyWorker
             {
                 throw new FileNotFoundException();
             }
-                
+
             ConfigurationRoot = GetConfigurationRoot();
 
         }
@@ -65,8 +66,9 @@ namespace TempyWorker
             }
 
             return false;
-            
+
         }
+
         public IConfigurationRoot GetConfigurationRoot()
         {
             // set up configuration
@@ -79,22 +81,6 @@ namespace TempyWorker
             return configuration;
         }
 
-        /// <summary>
-        /// Validate theat the values in logging config are not null.
-        /// </summary>
-        /// <param name="loggingConfig"></param>
-        /// <returns></returns>
-        public bool IsValidLoggingConfig(LoggingConfig loggingConfig)
-        {
-
-            if (loggingConfig.LogDirectory == null || loggingConfig.LogFileName == null)
-            {
-                return false;
-            }
-
-            return true;
-        }
-        
         public NetatmoApiAuthCredentials GetNetatmoApiAuthCredentials()
         {
             // instantiate netatmoCreds object that will keep our credentials
@@ -103,27 +89,52 @@ namespace TempyWorker
             ConfigurationRoot.GetSection("netatmo_api_auth").Bind(netatmoCreds);
             return netatmoCreds;
         }
-        
+
         public LoggingConfig GetLoggingConfig()
         {
-           var loggingConfig = new LoggingConfig();
-           ConfigurationRoot.GetSection("logging").Bind(loggingConfig);
-            if (IsValidLoggingConfig(loggingConfig))
+            var loggingConfig = new LoggingConfig();
+            ConfigurationRoot.GetSection("logging").Bind(loggingConfig);
+            if (loggingConfig.IsValid)
             {
                 return loggingConfig;
             }
             else
             {
-                throw new Exception("Invalid logging config provided!");
+                throw new Exception("Invalid or incomplete logging config provided!");
             }
         }
 
     }
-    
+
     public class LoggingConfig
     {
         public string LogDirectory { get; set; }
         public string LogFileName { get; set; }
-        public string LogFilePath => Path.Combine(LogDirectory, LogFileName);
+
+        public string LogFilePath
+        {
+            get
+            {
+                if (IsValid)
+                {
+                    return Path.Combine(LogDirectory, LogFileName);
+                }
+
+                return null;
+            }
+        }
+
+        public bool IsValid
+        {
+            get
+            {
+                if (LogDirectory == null || LogFileName == null)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
     }
 }

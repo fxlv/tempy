@@ -93,13 +93,29 @@ namespace TempyWorker.Test
         /// with a clarifying message
         /// </summary>
         [Fact]
-        public void InvalidLoggingConfigThrowsException()
+        public void MissingLoggingConfigThrowsException()
         {
             
             string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "logging_config_missing")); 
             TempyConfiguration tConfiguration = new TempyConfiguration(configFileDirectory);
 
             Assert.Throws<System.Exception>(() => TempyLogger.Initilize(tConfiguration));
+        }
+
+        /// <summary>
+        /// In case the logging config is invalid or malformed we expect an exception to be thrown
+        /// because the property LogFilePath wont be constructed
+        /// </summary>
+        [Fact]
+        public void InvalidLoggingConfigSectionThrowsException()
+        {
+            string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "logging_config_incomplete")); 
+            TempyConfiguration tConfiguration = new TempyConfiguration(configFileDirectory);
+            // so far so good, the config was constructed, but it is missing the logging part
+            // we now try to initialize logging, this will fail, because logging initializer expects
+            // LogFilePath, which cannot be constructed now due to the missing logging config
+            Assert.Throws<System.Exception>( () => TempyLogger.Initilize(tConfiguration));
+
         }
     }
 }
