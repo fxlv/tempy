@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
 using NetatmoLib;
@@ -12,7 +13,7 @@ namespace TempyWorker
 {
     public class Worker
     {
-        
+
 
         public void Run()
         {
@@ -101,7 +102,7 @@ namespace TempyWorker
             return measurement;
         }
 
-        public void PostMeasurement(string tempyApiTarget, DataObjects.Measurement measurement)
+        public bool PostMeasurement(string tempyApiTarget, DataObjects.Measurement measurement)
         {
             var client = new RestClient();
             client.BaseUrl = new Uri($"http://{tempyApiTarget}/");
@@ -112,8 +113,18 @@ namespace TempyWorker
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json; charset=utf-8", json, ParameterType.RequestBody);
             // todo: make the execute async
-            client.Execute(request);
-            // todo: check and return result of the POST query
+            var response = client.Execute(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                Log.Debug($"Post OK");
+                return true;
+            }
+            else
+            {
+                Log.Warning($"Post FAILED");
+                return false;
+
+            }            
         }
     }
 }
