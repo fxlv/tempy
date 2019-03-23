@@ -1,9 +1,9 @@
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Warning"
-    }
-  },
+    "logging": {
+      "LogDirectory":"log",
+      "LogFileName":"api.log"
+    },
+    
   "AllowedHosts": "*",
   "CosmosDbAuthSettings": {
     "DocumentDBEndpointUri": "https://YOURDBURLHERE.documents.azure.com:443/",
