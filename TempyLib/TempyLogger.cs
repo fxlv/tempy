@@ -21,5 +21,7 @@ namespace TempyWorker
             Log.Debug($"Using configuration file: {tConfiguration.ConfigurationFile}");
             Log.Information($"Logging initialized, writing DEBUG logs to {loggingConfig.LogFilePath}");
         }
+
+       
     }
 }

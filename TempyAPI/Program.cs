@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
+
 using TempyWorker;
 
 namespace TempyAPI
@@ -16,6 +15,7 @@ namespace TempyAPI
             TempyLogger.Initilize(tConfiguration);
             
             CreateWebHostBuilder(args).Build().Run();
+            Log.Information("Web server started");
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
@@ -32,6 +32,14 @@ namespace TempyAPI
                 })
                 .UseStartup<Startup>()
                 .UseUrls("http://*:5000");
+           
+        }
+        
+        // TODO: move this somewhere else, not sure where yet.
+        public static void LogHttpRequest(string method, string statusCode, string remoteIp, string requestPath)
+        {
+            Log.Debug($"{method} {statusCode} {remoteIp} {requestPath}");
+
         }
     }
 }

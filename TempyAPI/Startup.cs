@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace TempyAPI
 {
@@ -30,6 +31,7 @@ namespace TempyAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                Log.Debug("Using development configuration.");
             }
             else
             {
@@ -37,6 +39,7 @@ namespace TempyAPI
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
                 app.UseHttpsRedirection();
+                Log.Debug("Using production configuration.");
             }
 
             app.UseMvc();
