@@ -7,6 +7,19 @@ using Microsoft.Extensions.Primitives;
 namespace TempyAPI.Controllers
 
 {
+
+    [Route("status")]
+    [ApiController]
+    public class StatusController : ControllerBase
+    {
+        // GET /status
+        [HttpGet]
+        public string GetStatus()
+        {
+            return "OK";
+        }
+    }
+    
     [Route("api/measurements")]
     [ApiController]
     public class MeasurementsController : ControllerBase
@@ -22,6 +35,7 @@ namespace TempyAPI.Controllers
             _cosmosDbAuthSettings = cosmosDbAuthSettings;
         }
 
+    
         // GET api/measurements
         [HttpGet]
         public JsonResult GetAllMeasurementst()
