@@ -20,6 +20,7 @@ namespace TempyWorker
             public string TempyApiTarget { get; set; }
             public NetatmoApiAuthCredentials NetatmoCreds { get; set;  }
             public int SleepSeconds { get; set; }
+            public int FailSleep = 30;
 
             public RunnerConfig(string tempyApiTarget, NetatmoApiAuthCredentials netatmoCreds, int sleepSeconds = 300)
             {
@@ -49,18 +50,23 @@ namespace TempyWorker
             // run the actual worker runs
             // check their exit codes
             // provide sleep between runs and do backoff in case api status is not 200
+            int failCounter = 0;
+            
             while (true)
             {
                 if (CheckApiStatus(runnerConfig))
                 {
                     WorkerRun(runnerConfig);
+                    failCounter = 0; // reset fail counter
                 }
                 else
                 {
                     Log.Warning("Tempy API not available.");
+                    failCounter += 1;
                 }
-                Log.Debug($"Sleeping for {runnerConfig.SleepSeconds} seconds");
-                var sleepSeconds = runnerConfig.SleepSeconds * 1000;
+                int sleepSeconds = runnerConfig.SleepSeconds + (failCounter * runnerConfig.FailSleep);
+                Log.Debug($"Sleeping for {sleepSeconds} seconds");
+                sleepSeconds = sleepSeconds * 1000;
                 Thread.Sleep(sleepSeconds);
             }
         }
