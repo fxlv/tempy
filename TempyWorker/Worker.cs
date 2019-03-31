@@ -25,6 +25,7 @@ namespace TempyWorker
             {
                 NetatmoCreds = netatmoCreds;
                 TempyApiTarget = tempyApiTarget;
+                SleepSeconds = sleepSeconds;
             }
         }
         
@@ -48,13 +49,19 @@ namespace TempyWorker
             // run the actual worker runs
             // check their exit codes
             // provide sleep between runs and do backoff in case api status is not 200
-            if (CheckApiStatus(runnerConfig))
+            while (true)
             {
-                while (true) WorkerRun(runnerConfig);
-            }
-            else
-            {
-                throw new Exception("Tempy API not available.");
+                if (CheckApiStatus(runnerConfig))
+                {
+                    WorkerRun(runnerConfig);
+                }
+                else
+                {
+                    Log.Warning("Tempy API not available.");
+                }
+                Log.Debug($"Sleeping for {runnerConfig.SleepSeconds} seconds");
+                var sleepSeconds = runnerConfig.SleepSeconds * 1000;
+                Thread.Sleep(sleepSeconds);
             }
         }
         public async void WorkerRun(RunnerConfig runnerConfig)
@@ -90,9 +97,7 @@ namespace TempyWorker
 
             stopwatch.Stop();
             Log.Debug($"Worker run took {stopwatch.Elapsed}");
-            // todo: sleep should not be happening here, it should only do the check
-            var sleepSeconds = runnerConfig.SleepSeconds * 1000;
-            Thread.Sleep(sleepSeconds);
+            
         }
 
         public DataObjects.Measurement AssembleMeasurement(Device device,
