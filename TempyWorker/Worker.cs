@@ -15,6 +15,19 @@ namespace TempyWorker
     {
 
 
+        public class RunnerConfig
+        {
+            public string TempyApiTarget { get; set; }
+            public NetatmoApiAuthCredentials NetatmoCreds { get; set;  }
+            public int SleepSeconds { get; set; }
+
+            public RunnerConfig(string tempyApiTarget, NetatmoApiAuthCredentials netatmoCreds, int sleepSeconds = 300)
+            {
+                NetatmoCreds = netatmoCreds;
+                TempyApiTarget = tempyApiTarget;
+            }
+        }
+        
         public void Run()
         {
             var tempyConfiguration = new TempyConfiguration();
@@ -23,14 +36,28 @@ namespace TempyWorker
 
             var tempyApiTarget = Environment.GetEnvironmentVariable("TEMPY_API_TARGET");
             if (tempyApiTarget == null) tempyApiTarget = "localhost:5000";
+            
+            
+            var runnerConfig = new RunnerConfig(tempyApiTarget,netatmoCreds);
 
-            // go into loop and constantly (configurable sleep interval) call worker()
-            while (true) WorkerRunner(netatmoCreds, tempyApiTarget);
+            WorkerRunner(runnerConfig);            
         }
 
-
-        public async void WorkerRunner(NetatmoApiAuthCredentials netatmoCreds, string tempyApiTarget,
-            int sleepSeconds = 300)
+        public void WorkerRunner(RunnerConfig runnerConfig)
+        {
+            // run the actual worker runs
+            // check their exit codes
+            // provide sleep between runs and do backoff in case api status is not 200
+            if (CheckApiStatus(runnerConfig))
+            {
+                while (true) WorkerRun(runnerConfig);
+            }
+            else
+            {
+                throw new Exception("Tempy API not available.");
+            }
+        }
+        public async void WorkerRun(RunnerConfig runnerConfig)
         {
             // do netatmo auth
             // initializes netatmolib
@@ -43,7 +70,7 @@ namespace TempyWorker
 
             Log.Debug("Doing worker run");
 
-            var auth = new NetatmoAuth(netatmoCreds);
+            var auth = new NetatmoAuth(runnerConfig.NetatmoCreds);
             // for now, run synchronously
             // TODO: change this to run async
             var devices = NetatmoQueries.GetTempAsync(auth.GetToken()).GetAwaiter().GetResult();
@@ -51,10 +78,10 @@ namespace TempyWorker
             foreach (var device in devices)
                 if (DateTimeOps.IsDataFresh(device.last_status_store))
                 {
-                    PostMeasurement(tempyApiTarget,
+                    PostMeasurement(runnerConfig.TempyApiTarget,
                         AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
-                    PostMeasurement(tempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
-                    PostMeasurement(tempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
+                    PostMeasurement(runnerConfig.TempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
+                    PostMeasurement(runnerConfig.TempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
                 }
                 else
                 {
@@ -63,8 +90,8 @@ namespace TempyWorker
 
             stopwatch.Stop();
             Log.Debug($"Worker run took {stopwatch.Elapsed}");
-
-            sleepSeconds = sleepSeconds * 1000;
+            // todo: sleep should not be happening here, it should only do the check
+            var sleepSeconds = runnerConfig.SleepSeconds * 1000;
             Thread.Sleep(sleepSeconds);
         }
 
@@ -100,6 +127,29 @@ namespace TempyWorker
             measurement.Source.Location = $"{device.place.city}, {device.place.country}";
 
             return measurement;
+        }
+
+        public bool CheckApiStatus(RunnerConfig runnerConfig)
+        {
+            var client = new RestClient();
+            client.BaseUrl = new Uri($"http://{runnerConfig.TempyApiTarget}/");
+            var request = new RestRequest("status", Method.GET);
+            request.RequestFormat = DataFormat.Json;
+            Log.Debug($"Checking the health status via {client.BaseUrl}");
+            request.AddHeader("Content-Type", "application/json");
+            // todo: make the execute async
+            var response = client.Execute(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {    
+                Log.Debug("Health check is successful.");
+                return true;
+            }
+            else
+            {
+                Log.Warning("Health check failed.");
+                return false;
+
+            }
         }
 
         public bool PostMeasurement(string tempyApiTarget, DataObjects.Measurement measurement)
