@@ -23,6 +23,12 @@ namespace TempyAPI
             var cosmosDbAuthSettings = new TempyDbAuthCredentials();
             Configuration.Bind("CosmosDbAuthSettings", cosmosDbAuthSettings);
             services.AddSingleton(cosmosDbAuthSettings);
+            // add a policy to allow CORS requests from any origins, 
+            // this will be used for remote Javascript to fetch TempyAPI data
+            services.AddCors(
+                o => o.AddPolicy("AllowAnyOriginPolicy", builder =>
+                    builder.AllowAnyOrigin())
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -31,6 +37,7 @@ namespace TempyAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseStaticFiles();
                 Log.Debug("Using development configuration.");
             }
             else

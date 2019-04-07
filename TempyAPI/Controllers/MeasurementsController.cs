@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
+using Serilog;
 
 
 namespace TempyAPI.Controllers
 
 {
-
+    [EnableCors("AllowAnyOriginPolicy")]
     [Route("status")]
     [ApiController]
     public class StatusController : ControllerBase
@@ -16,6 +18,7 @@ namespace TempyAPI.Controllers
         [HttpGet]
         public string GetStatus()
         {
+            Program.LogHttpRequest(Request.Method.ToString(), Response.StatusCode.ToString(), HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
             return "OK";
         }
     }
