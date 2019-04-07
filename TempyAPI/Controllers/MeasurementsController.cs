@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -50,6 +51,7 @@ namespace TempyAPI.Controllers
         }
 
         // GET api/measurements/name/<>
+        [EnableCors("AllowAnyOriginPolicy")]
         [HttpGet("name/{name}")]
         public JsonResult GetLastMeasurement(string name)
         {
@@ -57,8 +59,9 @@ namespace TempyAPI.Controllers
             var result = db.GetLatestTemperatureMeasurementByName(name);
             Program.LogHttpRequest(Request.Method, Response.StatusCode.ToString(),
                 HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
-
-            return new JsonResult(result);
+            var jsonResult = new JsonResult(result);
+            
+            return jsonResult;
         }
 
         // POST api/measurements
