@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
-using Serilog;
-
 
 namespace TempyAPI.Controllers
 
@@ -18,11 +15,12 @@ namespace TempyAPI.Controllers
         [HttpGet]
         public string GetStatus()
         {
-            Program.LogHttpRequest(Request.Method.ToString(), Response.StatusCode.ToString(), HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
+            Program.LogHttpRequest(Request.Method, Response.StatusCode.ToString(),
+                HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
             return "OK";
         }
     }
-    
+
     [Route("api/measurements")]
     [ApiController]
     public class MeasurementsController : ControllerBase
@@ -38,7 +36,7 @@ namespace TempyAPI.Controllers
             _cosmosDbAuthSettings = cosmosDbAuthSettings;
         }
 
-    
+
         // GET api/measurements
         [HttpGet]
         public JsonResult GetAllMeasurementst()
@@ -46,7 +44,8 @@ namespace TempyAPI.Controllers
             //TODO: don't create a new cosmosdb connection every time
             var db = new TempyDB(_cosmosDbAuthSettings);
             var result = db.GetTemperatureMeasurements();
-            Program.LogHttpRequest(Request.Method.ToString(), Response.StatusCode.ToString(), HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
+            Program.LogHttpRequest(Request.Method, Response.StatusCode.ToString(),
+                HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
             return new JsonResult(result);
         }
 
@@ -56,7 +55,8 @@ namespace TempyAPI.Controllers
         {
             var db = new TempyDB(_cosmosDbAuthSettings);
             var result = db.GetLatestTemperatureMeasurementByName(name);
-            Program.LogHttpRequest(Request.Method.ToString(), Response.StatusCode.ToString(), HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
+            Program.LogHttpRequest(Request.Method, Response.StatusCode.ToString(),
+                HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
 
             return new JsonResult(result);
         }
@@ -68,10 +68,10 @@ namespace TempyAPI.Controllers
             var db = new TempyDB(_cosmosDbAuthSettings);
             db.WriteDocument(measurement);
             //todo: return only status code
-            Program.LogHttpRequest(Request.Method.ToString(), Response.StatusCode.ToString(), HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
+            Program.LogHttpRequest(Request.Method, Response.StatusCode.ToString(),
+                HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
 
-            
-            
+
             return measurement.ToString();
         }
     }
