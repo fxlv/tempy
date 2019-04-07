@@ -32,15 +32,14 @@ namespace TempyAPI
         }
 
 
-        public IQueryable<DataObjects.TemperatureMeasurement> GetLatestTemperatureMeasurementByName(string name)
+        public DataObjects.TemperatureMeasurement GetLatestTemperatureMeasurementByName(string name)
         {
-            var queryOptions = new FeedOptions {MaxItemCount = -1};
+            var queryOptions = new FeedOptions {MaxItemCount = 1};
 
             var sql =
                 $"SELECT TOP 1 * FROM TemperatureMeasurements WHERE TemperatureMeasurements.Name = '{name}' ORDER BY TemperatureMeasurements.UnixTimestamp DESC";
             var measurementsQuery = client.CreateDocumentQuery<DataObjects.TemperatureMeasurement>(
-                collectionUri, sql, queryOptions);
-
+                collectionUri, sql, queryOptions).AsEnumerable().FirstOrDefault();
 
             return measurementsQuery;
         }
