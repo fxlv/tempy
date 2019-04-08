@@ -50,13 +50,27 @@ namespace TempyAPI.Controllers
             return new JsonResult(result);
         }
 
-        // GET api/measurements/name/<>
+        // GET api/measurements/<name>
         [EnableCors("AllowAnyOriginPolicy")]
-        [HttpGet("name/{name}")]
+        [HttpGet("{name}")]
         public JsonResult GetLastMeasurement(string name)
         {
             var db = new TempyDB(_cosmosDbAuthSettings);
-            var result = db.GetLatestTemperatureMeasurementByName(name);
+            var result = db.GetLatestMeasurementByName(name);
+            Program.LogHttpRequest(Request.Method, Response.StatusCode.ToString(),
+                HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
+            var jsonResult = new JsonResult(result);
+            
+            return jsonResult;
+        }
+        
+        // GET api/measurements/<name>/<type>
+        [EnableCors("AllowAnyOriginPolicy")]
+        [HttpGet("{name}/{measurementType}")]
+        public JsonResult GetLastMeasurementType(string name, int measurementType)
+        {
+            var db = new TempyDB(_cosmosDbAuthSettings);
+            var result = db.GetLatestMeasurementByName(name, measurementType);
             Program.LogHttpRequest(Request.Method, Response.StatusCode.ToString(),
                 HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
             var jsonResult = new JsonResult(result);
