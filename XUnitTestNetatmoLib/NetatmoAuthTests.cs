@@ -67,6 +67,20 @@ namespace XUnitTestNetatmoLib
         }
         
         [Fact]
+        public void ParsingDoubleIncompleteNetatmoResponseIsHandledGracefully()
+        {          
+            // read in an example json response from a file
+            var cwd = Directory.GetCurrentDirectory();
+            var path = Path.Combine(cwd, @"TestFiles/netatmo_response_double_incomplete.json");
+            var content = Validators.ReadFile(path);
+            // act   
+            var actual = NetatmoQueries.ParseResponse(content);
+            // assert
+            Assert.IsType<List<Device>>(actual);
+            Assert.True(actual.Count == 2);
+        }
+        
+        [Fact]
         public void ParsingValidSingleNetatmoResponseStringReturnsListOfDevices()
         {          
             // read in an example json response from a file
