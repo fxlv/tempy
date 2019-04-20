@@ -16,4 +16,18 @@
     <ProjectReference Include="..\NetatmoLib\NetatmoLib.csproj" />
     <ProjectReference Include="..\TempyWorker\TempyWorker.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="TestFiles\netatmo_response.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestFiles\netatmo_response_double.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestFiles\netatmo_response_single.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestFiles\netatmo_response_body.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

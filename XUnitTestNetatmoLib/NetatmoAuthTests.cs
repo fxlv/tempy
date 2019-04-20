@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NetatmoLib;
 using Xunit;
 using TempyWorker;
@@ -30,6 +31,53 @@ namespace XUnitTestNetatmoLib
             // assert that the auth token is not null
             Assert.True(auth.GetToken() != null);
 
+        }
+    }
+
+    public class NetatmoQueriesTests
+    {
+        
+        [Fact]
+        public void ExtractingBodyFromJsonStringReturnsValidResult()
+        {          
+            // read in an example json response from a file
+            var cwd = Directory.GetCurrentDirectory();
+            var path = Path.Combine(cwd, @"TestFiles/netatmo_response_body.json");
+            var content = Validators.ReadFile(path);
+            var expectedString = "{\n  \"devices\": []\n}";
+            // act   
+            var actual = NetatmoQueries.GetJsonBody(content);
+            // assert
+            Assert.Equal(expectedString, actual);
+        
+        }
+        
+        [Fact]
+        public void ParsingValidDoubleNetatmoResponseStringReturnsListOfDevices()
+        {          
+            // read in an example json response from a file
+            var cwd = Directory.GetCurrentDirectory();
+            var path = Path.Combine(cwd, @"TestFiles/netatmo_response_double.json");
+            var content = Validators.ReadFile(path);
+            // act   
+            var actual = NetatmoQueries.ParseResponse(content);
+            // assert
+            Assert.IsType<List<Device>>(actual);
+            Assert.True(actual.Count == 2);
+        }
+        
+        [Fact]
+        public void ParsingValidSingleNetatmoResponseStringReturnsListOfDevices()
+        {          
+            // read in an example json response from a file
+            var cwd = Directory.GetCurrentDirectory();
+            var path = Path.Combine(cwd, @"TestFiles/netatmo_response_single.json");
+            var content = Validators.ReadFile(path);
+            // act   
+            var actual = NetatmoQueries.ParseResponse(content);
+            // assert
+            Assert.IsType<List<Device>>(actual);
+            Assert.True(actual.Count == 1);
         }
     }
 }
