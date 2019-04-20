@@ -3,6 +3,8 @@ using NetatmoLib;
 using Xunit;
 using TempyWorker;
 using System.IO;
+using TempyConfiguration;
+using TempyLib;
 
 namespace XUnitTestNetatmoLib
 {
@@ -21,7 +23,7 @@ namespace XUnitTestNetatmoLib
             string configFileDirectory  = Path.GetFullPath(Path.Combine(cwd, @"../../../../TempyWorker"));
             
             var w = new Worker();
-            var tempyConfiguration = new TempyConfiguration(configFileDirectory);
+            var tempyConfiguration = new Configuration(configFileDirectory);
             var configuration = tempyConfiguration.GetConfigurationRoot();
             var netatmoCreds = tempyConfiguration.GetNetatmoApiAuthCredentials();
             var auth = new NetatmoAuth(netatmoCreds);

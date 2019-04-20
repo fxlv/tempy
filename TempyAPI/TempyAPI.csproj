@@ -29,6 +29,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\TempyConfiguration\TempyConfiguration.csproj" />
       <ProjectReference Include="..\TempyLib\TempyLib.csproj" />
+      <ProjectReference Include="..\TempyLogger\TempyLogger.csproj" />
     </ItemGroup>
 </Project>

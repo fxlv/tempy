@@ -1,6 +1,8 @@
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Xunit;
+using TempyConfiguration;
+using TempyLogger;
 
 namespace TempyWorker.Test
 {
@@ -13,13 +15,13 @@ namespace TempyWorker.Test
             //var tempyWorkerBasePath = Path.GetFullPath(Path.Combine(cwd, @""));
             testFilesDir = Path.GetFullPath(Path.Combine(cwd, @"../../../../TempyWorker.Test/TestFiles/"));
             string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "both_exist"));
-            TempyConfiguration = new TempyConfiguration(configFileDirectory);
+            TempyConfiguration = new Configuration(configFileDirectory);
             Configuration = TempyConfiguration.GetConfigurationRoot();
         }
 
         public static IConfigurationRoot Configuration { get; set; }
         public Worker Worker;
-        public TempyConfiguration TempyConfiguration;
+        public Configuration TempyConfiguration;
         public string cwd { get; set;  }
         public string testFilesDir { get; set;  }
 
@@ -55,7 +57,7 @@ namespace TempyWorker.Test
         public void FallBackToDefaultConfigFile_when_config_missing()
         {
             string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "default_missing")); 
-            TempyConfiguration = new TempyConfiguration(configFileDirectory);
+            TempyConfiguration = new Configuration(configFileDirectory);
             // get the currently used config file base name
             var configBaseName = Path.GetFileName(TempyConfiguration.ConfigurationFile); 
             // assert we have fallen back to using the default config file
@@ -71,7 +73,7 @@ namespace TempyWorker.Test
         public void FallBackToDefaultConfigFile_when_config_corrupted()
         {
             string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "default_corrupted")); 
-            TempyConfiguration = new TempyConfiguration(configFileDirectory);
+            TempyConfiguration = new Configuration(configFileDirectory);
             // get the currently used config file base name
             var configBaseName = Path.GetFileName(TempyConfiguration.ConfigurationFile); 
             // assert we have fallen back to using the default config file
@@ -85,7 +87,7 @@ namespace TempyWorker.Test
         public void ThrowExceptionWhenConfigurationFilesAreMissing()
         {
            string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "both_missing"));        
-           Assert.Throws<FileNotFoundException>(() => new TempyConfiguration(configFileDirectory));
+           Assert.Throws<FileNotFoundException>(() => new Configuration(configFileDirectory));
         }
 
         /// <summary>
@@ -97,9 +99,9 @@ namespace TempyWorker.Test
         {
             
             string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "logging_config_missing")); 
-            TempyConfiguration tConfiguration = new TempyConfiguration(configFileDirectory);
+            Configuration tConfiguration = new Configuration(configFileDirectory);
 
-            Assert.Throws<System.Exception>(() => TempyLogger.Initilize(tConfiguration));
+            Assert.Throws<System.Exception>(() => Logger.Initilize(tConfiguration));
         }
 
         /// <summary>
@@ -110,11 +112,11 @@ namespace TempyWorker.Test
         public void InvalidLoggingConfigSectionThrowsException()
         {
             string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "logging_config_incomplete")); 
-            TempyConfiguration tConfiguration = new TempyConfiguration(configFileDirectory);
+            Configuration tConfiguration = new Configuration(configFileDirectory);
             // so far so good, the config was constructed, but it is missing the logging part
             // we now try to initialize logging, this will fail, because logging initializer expects
             // LogFilePath, which cannot be constructed now due to the missing logging config
-            Assert.Throws<System.Exception>( () => TempyLogger.Initilize(tConfiguration));
+            Assert.Throws<System.Exception>( () => Logger.Initilize(tConfiguration));
 
         }
     }

@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NetatmoLib\NetatmoLib.csproj" />
+      <ProjectReference Include="..\TempyConfiguration\TempyConfiguration.csproj" />
       <ProjectReference Include="..\TempyWorker\TempyWorker.csproj" />
     </ItemGroup>
 
