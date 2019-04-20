@@ -1,16 +1,17 @@
 ﻿using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using TempyConfiguration;
 
-namespace TempyWorker
+namespace TempyLogger
 {
-    public static class TempyLogger
+    public static class Logger
     {
         /// <summary>
         ///     Initialize the logger
         /// </summary>
         /// <param name="tConfiguration"></param>
-        public static void Initilize(TempyConfiguration tConfiguration)
+        public static void Initilize(Configuration tConfiguration)
         {
             // initialize logging
 

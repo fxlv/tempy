@@ -1,19 +1,18 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using Microsoft.Extensions.Configuration;
-using Serilog.Configuration;
 using NetatmoLib;
+using TempyLib;
 
-namespace TempyWorker
+namespace TempyConfiguration
 {
-    public class TempyConfiguration
+    public class Configuration
     {
         public IConfigurationRoot ConfigurationRoot { get; set; }
         public string ConfigDirectory { get; set; }
         public string ConfigurationFile { get; set; }
 
-        public TempyConfiguration(string _configDirectory = null)
+        public Configuration(string _configDirectory = null)
         {
             if (_configDirectory == null)
             {
@@ -34,12 +33,12 @@ namespace TempyWorker
             string primaryConfigFileName = Path.Combine(ConfigDirectory, "appsettings.json");
             string secondaryConfigFileName = Path.Combine(ConfigDirectory, "appsettings.json.default");
 
-            if (File.Exists(primaryConfigFileName) && IsValidJsonFile(primaryConfigFileName))
+            if (File.Exists(primaryConfigFileName) && Validators.IsValidJsonFile(primaryConfigFileName))
             {
                 ConfigurationFile = primaryConfigFileName;
 
             }
-            else if (File.Exists(secondaryConfigFileName) && IsValidJsonFile(secondaryConfigFileName))
+            else if (File.Exists(secondaryConfigFileName) && Validators.IsValidJsonFile(secondaryConfigFileName))
             {
                 ConfigurationFile = secondaryConfigFileName;
             }
@@ -51,23 +50,7 @@ namespace TempyWorker
             ConfigurationRoot = GetConfigurationRoot();
 
         }
-
-        public bool IsValidJsonFile(string fileName)
-        {
-            string content = System.IO.File.ReadAllText(fileName);
-            // trim whitespace from both ends
-            content = content.Trim();
-            if (content.StartsWith("{"))
-            {
-                if (content.EndsWith("}"))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-
-        }
+        
 
         public IConfigurationRoot GetConfigurationRoot()
         {
