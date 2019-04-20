@@ -1,0 +1,201 @@
+{
+    "body": {
+        "devices": [
+            {
+                "_id": "71:aa:21:44:2s:a1",
+                "cipher_id": "ena:11:\/N11q1qLL\/1aaa53M\/B11111hO9RjZG+xKCBDeyNd\/OUTaaaaLKRH8mNaaaaa1aa",
+                "date_setup": 1520768325,
+                "last_setup": 1520768325,
+                "type": "NAMain",
+                "last_status_store": 1555664440,
+                "module_name": "Liel\u0101 istaba",
+                "firmware": 134,
+                "last_upgrade": 1520768329,
+                "wifi_status": 42,
+                "reachable": true,
+                "co2_calibrating": false,
+                "station_name": "Teika",
+                "data_type": [
+                    "Temperature",
+                    "CO2",
+                    "Humidity",
+                    "Noise",
+                    "Pressure"
+                ],
+                "place": {
+                    "altitude": 11,
+                    "city": "Riga",
+                    "country": "LV",
+                    "timezone": "Europe\/Riga",
+                    "location": [
+                        24.177987,
+                        56.978432
+                    ]
+                },
+                "dashboard_data": {
+                    "time_utc": 1555664431,
+                    "Temperature": 24.3,
+                    "CO2": 1807,
+                    "Humidity": 42,
+                    "Noise": 39,
+                    "Pressure": 1037.3,
+                    "AbsolutePressure": 1036,
+                    "min_temp": 23.9,
+                    "max_temp": 24.3,
+                    "date_min_temp": 1555621968,
+                    "date_max_temp": 1555659324,
+                    "temp_trend": "stable",
+                    "pressure_trend": "stable"
+                },
+                "modules": [
+                    {
+                        "_id": "03:11:11:11:11:11",
+                        "type": "NAModule1",
+                        "module_name": "Virtuv\u0113 aiz loga",
+                        "data_type": [
+                            "Temperature",
+                            "Humidity"
+                        ],
+                        "last_setup": 1520768326,
+                        "reachable": true,
+                        "dashboard_data": {
+                            "time_utc": 1555664388,
+                            "Temperature": 13.8,
+                            "Humidity": 35,
+                            "min_temp": 2.8,
+                            "max_temp": 13.8,
+                            "date_min_temp": 1555644873,
+                            "date_max_temp": 1555663823,
+                            "temp_trend": "up"
+                        },
+                        "firmware": 46,
+                        "last_message": 1555664439,
+                        "last_seen": 1555664439,
+                        "rf_status": 68,
+                        "battery_vp": 5356,
+                        "battery_percent": 73
+                    },
+                    {
+                        "_id": "01:11:00:11:11:11",
+                        "type": "NAModule4",
+                        "module_name": "Gu\u013camistaba",
+                        "data_type": [
+                            "Temperature",
+                            "CO2",
+                            "Humidity"
+                        ],
+                        "last_setup": 1522957406,
+                        "reachable": true,
+                        "dashboard_data": {
+                            "time_utc": 1555664407,
+                            "Temperature": 24.8,
+                            "CO2": 833,
+                            "Humidity": 37,
+                            "min_temp": 23.3,
+                            "max_temp": 24.8,
+                            "date_min_temp": 1555621347,
+                            "date_max_temp": 1555663791,
+                            "temp_trend": "stable"
+                        },
+                        "firmware": 44,
+                        "last_message": 1555664440,
+                        "last_seen": 1555664407,
+                        "rf_status": 63,
+                        "battery_vp": 4547,
+                        "battery_percent": 19
+                    }
+                ]
+            },
+            {
+                "_id": "70:ee:50:2c:75:b0",
+                "cipher_id": "enc:11:EVYTRQASCeAyj8vlMmmmmmmmb6b0mmmmmN7PRZ3PlXBtuKGxYTRQ\/wGb0pMNBVfA",
+                "date_setup": 1520852278,
+                "last_setup": 1520852278,
+                "type": "NAMain",
+                "last_status_store": 1555664653,
+                "module_name": "Liela istaba",
+                "firmware": 134,
+                "last_upgrade": 1520852280,
+                "wifi_status": 57,
+                "reachable": true,
+                "co2_calibrating": false,
+                "station_name": "Heli, Tallinn",
+                "data_type": [
+                    "Temperature",
+                    "CO2",
+                    "Humidity",
+                    "Noise",
+                    "Pressure"
+                ],
+                "place": {
+                    "altitude": 36,
+                    "city": "Tallinn",
+                    "country": "EE",
+                    "timezone": "Europe\/Tallinn",
+                    "location": [
+                        24.656111,
+                        59.392111
+                    ]
+                },
+                "dashboard_data": {
+                    "time_utc": 1555664640,
+                    "Temperature": 24.4,
+                    "CO2": 462,
+                    "Humidity": 34,
+                    "Noise": 35,
+                    "Pressure": 1039.5,
+                    "AbsolutePressure": 1035.1,
+                    "min_temp": 23.4,
+                    "max_temp": 24.4,
+                    "date_min_temp": 1555641282,
+                    "date_max_temp": 1555655845,
+                    "temp_trend": "stable",
+                    "pressure_trend": "stable"
+                },
+                "modules": [
+                    {
+                        "_id": "11:00:00:11:11:11",
+                        "type": "NAModule1",
+                        "module_name": "Uz balkona",
+                        "data_type": [
+                            "Temperature",
+                            "Humidity"
+                        ],
+                        "last_setup": 1520852279,
+                        "reachable": true,
+                        "dashboard_data": {
+                            "time_utc": 1555664579,
+                            "Temperature": 16.4,
+                            "Humidity": 32,
+                            "min_temp": 3.4,
+                            "max_temp": 16.6,
+                            "date_min_temp": 1555639144,
+                            "date_max_temp": 1555662983,
+                            "temp_trend": "up"
+                        },
+                        "firmware": 46,
+                        "last_message": 1555664643,
+                        "last_seen": 1555664579,
+                        "rf_status": 87,
+                        "battery_vp": 5100,
+                        "battery_percent": 63
+                    }
+                ]
+            }
+        ],
+        "user": {
+            "mail": "email@example.com",
+            "administrative": {
+                "lang": "en-US",
+                "reg_locale": "en-LV",
+                "unit": 0,
+                "windunit": 2,
+                "pressureunit": 0,
+                "feel_like_algo": 0
+            }
+        }
+    },
+    "status": "ok",
+    "time_exec": 0.45544695854187,
+    "time_server": 1555664746
+}
