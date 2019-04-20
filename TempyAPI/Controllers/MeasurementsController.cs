@@ -38,9 +38,22 @@ namespace TempyAPI.Controllers
         }
 
 
+        // GET api/names
+        [EnableCors("AllowAnyOriginPolicy")]
+        [HttpGet("names")]
+        public JsonResult GetNames()
+        {
+            //TODO: don't create a new cosmosdb connection every time
+            var db = new TempyDB(_cosmosDbAuthSettings);
+            var result = db.GetNames();
+            Program.LogHttpRequest(Request.Method, Response.StatusCode.ToString(),
+                HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
+            return new JsonResult(result);
+        }
+        
         // GET api/measurements
         [HttpGet]
-        public JsonResult GetAllMeasurementst()
+        public JsonResult GetAllMeasurements()
         {
             //TODO: don't create a new cosmosdb connection every time
             var db = new TempyDB(_cosmosDbAuthSettings);

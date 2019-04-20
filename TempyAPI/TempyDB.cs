@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Azure.Documents.Client;
 
@@ -51,6 +52,21 @@ namespace TempyAPI
             return measurementsQuery;
         }
 
+        public List<string> GetNames()
+        {
+            var queryOptions = new FeedOptions {MaxItemCount = -1};
+            var sql = "SELECT distinct TemperatureMeasurements.Name FROM TemperatureMeasurements";
+            IQueryable<dynamic> measurementsQuery =
+                client.CreateDocumentQuery<DataObjects.TemperatureMeasurement>(collectionUri, sql, queryOptions);
+            List<string> names = new List<string>();
+            foreach (var v in measurementsQuery)
+            {
+                names.Add(v.Name);
+            }
+
+           
+            return names;
+        }
 
         public IQueryable<DataObjects.TemperatureMeasurement> GetTemperatureMeasurements()
         {
@@ -59,7 +75,6 @@ namespace TempyAPI
                 client.CreateDocumentQuery<DataObjects.TemperatureMeasurement>(collectionUri, queryOptions);
             measurementsQuery = measurementsQuery.OrderByDescending(f => f.UnixTimestamp);
 
-            var count = measurementsQuery.Count();
             return measurementsQuery;
         }
     }
