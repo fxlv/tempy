@@ -20,6 +20,7 @@
     <ItemGroup>
       <ProjectReference Include="..\NetatmoLib\NetatmoLib.csproj" />
       <ProjectReference Include="..\TempyAPI\TempyAPI.csproj" />
+      <ProjectReference Include="..\TempyConfiguration\TempyConfiguration.csproj" />
       <ProjectReference Include="..\TempyLib\TempyLib.csproj" />
     </ItemGroup>
 

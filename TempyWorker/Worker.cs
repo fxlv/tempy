@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using RestSharp;
 using Serilog;
 using TempyAPI;
+using TempyConfiguration;
 
 namespace TempyWorker
 {
@@ -32,7 +33,7 @@ namespace TempyWorker
         
         public void Run()
         {
-            var tempyConfiguration = new TempyConfiguration();
+            var tempyConfiguration = new Configuration();
             var configuration = tempyConfiguration.GetConfigurationRoot();
             var netatmoCreds = tempyConfiguration.GetNetatmoApiAuthCredentials();
 

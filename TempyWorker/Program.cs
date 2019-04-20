@@ -1,4 +1,6 @@
 ﻿using System;
+using TempyConfiguration;
+using TempyLogger;
 
 namespace TempyWorker
 {
@@ -7,8 +9,8 @@ namespace TempyWorker
         private static void Main(string[] args)
         {
             
-            TempyConfiguration tConfiguration = new TempyConfiguration();
-            TempyLogger.Initilize(tConfiguration);
+            Configuration tConfiguration = new Configuration();
+            Logger.Initilize(tConfiguration);
             
             Console.Title = "Tempy Worker";
 
