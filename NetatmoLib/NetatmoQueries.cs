@@ -28,19 +28,17 @@ namespace NetatmoLib
             }
             catch (Exception e)
             {
-                if (e.InnerException.Message.Contains("Forbidden"))
+                if (e.Message.Contains("404 (Not Found)"))
                 {
-                    // TODO: No writing to Console from within a library
-                    Console.WriteLine("You are using invalid token");
+                    Log.Error("Encountered 404 not found response from Netatmo API");
+                    throw;
                 }
                 else
                 {
-                    // TODO: No writing to Console from within a library
-                    Console.WriteLine("Unexpected exception while sending request to Netatmo API");
-                    Console.WriteLine(e.InnerException.Message);
+                    Log.Error("Encountered unexpected exception. Details follow:");
+                    Log.Error(e.Message);
+                    throw;
                 }
-                // TODO: should not do this, rather catch exception in the CLI APP!
-                Environment.Exit(1);
             }
 
             return ParseResponse(response);

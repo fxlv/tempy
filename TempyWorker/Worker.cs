@@ -87,20 +87,30 @@ namespace TempyWorker
             var auth = new NetatmoAuth(runnerConfig.NetatmoCreds);
             // for now, run synchronously
             // TODO: change this to run async
-            var devices = NetatmoQueries.GetTempAsync(auth.GetToken()).GetAwaiter().GetResult();
 
-            foreach (var device in devices)
-                if (DateTimeOps.IsDataFresh(device.last_status_store))
-                {
-                    PostMeasurement(runnerConfig.TempyApiTarget,
-                        AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
-                    PostMeasurement(runnerConfig.TempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
-                    PostMeasurement(runnerConfig.TempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
-                }
-                else
-                {
-                    Log.Warning($"Data from device: {device} is more than 20 minutes old. Skipping.");
-                }
+            try
+            {
+                var devices = NetatmoQueries.GetTempAsync(auth.GetToken()).GetAwaiter().GetResult();
+                foreach (var device in devices)
+                    if (DateTimeOps.IsDataFresh(device.last_status_store))
+                    {
+                        PostMeasurement(runnerConfig.TempyApiTarget,
+                            AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
+                        PostMeasurement(runnerConfig.TempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
+                        PostMeasurement(runnerConfig.TempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
+                    }
+                    else
+                    {
+                        Log.Warning($"Data from device: {device} is more than 20 minutes old. Skipping.");
+                    }
+            }
+            catch (Exception e)
+            {
+                Log.Warning("Exception encountered during worker run!");
+                Log.Debug(e.Message);
+            }
+
+            
 
             stopwatch.Stop();
             Log.Debug($"Worker run took {stopwatch.Elapsed}");
