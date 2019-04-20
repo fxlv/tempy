@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-
-using TempyWorker;
+using TempyLogger;
 
 namespace TempyAPI
 {
@@ -11,8 +10,8 @@ namespace TempyAPI
     {
         public static void Main(string[] args)
         {
-            TempyConfiguration tConfiguration = new TempyConfiguration();
-            TempyLogger.Initilize(tConfiguration);
+            TempyConfiguration.Configuration tConfiguration = new TempyConfiguration.Configuration();
+            Logger.Initilize(tConfiguration);
             
             CreateWebHostBuilder(args).Build().Run();
             Log.Information("Web server started");
