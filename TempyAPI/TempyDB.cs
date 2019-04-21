@@ -2,12 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
-using Newtonsoft.Json.Serialization;
-using RestSharp.Extensions;
+using Microsoft.Azure.Documents.Linq;
 using Serilog;
-using Document = System.Reflection.Metadata.Document;
 
 namespace TempyAPI
 {
@@ -33,18 +30,19 @@ namespace TempyAPI
                     authCredentials.DocumentDBCollectionId);
         }
 
-        public  async void WriteDocument(DataObjects.Measurement measurement)
+        public async void WriteDocument(DataObjects.Measurement measurement)
         {
-            Stopwatch s = new Stopwatch();
+            var s = new Stopwatch();
             s.Start();
             var response = await client.CreateDocumentAsync(collectionUri, measurement);
             s.Stop();
-            Log.Debug($"Created document for {measurement.Name}; Time elapsed: {s.Elapsed}; Request charge: {response.RequestCharge}");
+            Log.Debug(
+                $"Created document for {measurement.Name}; Time elapsed: {s.Elapsed}; Request charge: {response.RequestCharge}");
         }
 
         /// <summary>
-        /// Returns the latest measurement with the specified name.
-        /// Measurement type defaults to Temperature (type 0).
+        ///     Returns the latest measurement with the specified name.
+        ///     Measurement type defaults to Temperature (type 0).
         /// </summary>
         /// <param name="name"></param>
         /// <param name="measurementType"></param>
@@ -52,35 +50,61 @@ namespace TempyAPI
         public DataObjects.TemperatureMeasurement GetLatestMeasurementByName(string name,
             int measurementType = 0)
         {
-            Stopwatch s = new Stopwatch();
+            var s = new Stopwatch();
             s.Start();
-            var queryOptions = new FeedOptions {MaxItemCount = 1};
+            var queryOptions = new FeedOptions {MaxItemCount = 1, PopulateQueryMetrics = true};
 
             var sql =
                 $"SELECT TOP 1 * FROM TemperatureMeasurements WHERE TemperatureMeasurements.Name = '{name}'  and TemperatureMeasurements.Type = {measurementType} ORDER BY TemperatureMeasurements.UnixTimestamp DESC";
-            var measurementsQuery = client.CreateDocumentQuery<DataObjects.TemperatureMeasurement>(
-                collectionUri, sql, queryOptions).AsEnumerable().FirstOrDefault();
+
+            var query = client.CreateDocumentQuery<DataObjects.TemperatureMeasurement>(collectionUri, sql, queryOptions)
+                .AsDocumentQuery();
+
+            var result = query.ExecuteNextAsync().GetAwaiter().GetResult();
+            DataObjects.TemperatureMeasurement temperatureResult = result.FirstOrDefault();
+            var metrics = result.QueryMetrics;
+            foreach (var metric in metrics)
+            {
+                var retryCount = metric.Value.Retries.ToString();
+                var totalTime = metric.Value.TotalTime.ToString();
+                var retrievedDocumentCount = metric.Value.RetrievedDocumentCount.ToString();
+                Log.Debug(
+                    $"CosmosDB metrics -> Request charge: {result.RequestCharge}; Retrieved documents: {retrievedDocumentCount}; Retry count: {retryCount}; Total time: {totalTime}");
+            }
+
             s.Stop();
-            Log.Debug($"GetLatestMeasurementByName({name},{measurementType}) returned in {s.Elapsed}");
-            return measurementsQuery;
+            Log.Debug($"GetLatestMeasurementByName({name},{measurementType}) returned in {s.Elapsed}; ");
+            return temperatureResult;
         }
 
         public List<string> GetNames()
         {
-            Stopwatch s = new Stopwatch();
+            var s = new Stopwatch();
             s.Start();
-            var queryOptions = new FeedOptions {MaxItemCount = -1};
+            var queryOptions = new FeedOptions {MaxItemCount = -1, PopulateQueryMetrics = true};
             var sql = "SELECT distinct TemperatureMeasurements.Name FROM TemperatureMeasurements";
-            IQueryable<dynamic> measurementsQuery =
-                client.CreateDocumentQuery<DataObjects.TemperatureMeasurement>(collectionUri, sql, queryOptions);
-            List<string> names = new List<string>();
-            foreach (var v in measurementsQuery)
+
+            var query = client.CreateDocumentQuery<DataObjects.TemperatureMeasurement>(collectionUri, sql, queryOptions)
+                .AsDocumentQuery();
+
+
+            var result = query.ExecuteNextAsync().GetAwaiter().GetResult();
+
+            var names = new List<string>();
+            foreach (var v in result) names.Add(v.Name);
+
+            var metrics = result.QueryMetrics;
+            foreach (var metric in metrics)
             {
-                names.Add(v.Name);
+                var retryCount = metric.Value.Retries.ToString();
+                var totalTime = metric.Value.TotalTime.ToString();
+                var retrievedDocumentCount = metric.Value.RetrievedDocumentCount.ToString();
+                Log.Debug(
+                    $"CosmosDB metrics -> Request charge: {result.RequestCharge}; Retrieved documents: {retrievedDocumentCount}; Retry count: {retryCount}; Total time: {totalTime}");
             }
 
-            //var offer = client.ReadOfferAsync().Result;
-           s.Stop();
+
+            s.Stop();
             Log.Debug($"Time elapsed in GetNames() is {s.Elapsed}");
             return names;
         }
