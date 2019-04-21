@@ -1,7 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json.Serialization;
+using RestSharp.Extensions;
+using Serilog;
+using Document = System.Reflection.Metadata.Document;
 
 namespace TempyAPI
 {
@@ -27,9 +33,13 @@ namespace TempyAPI
                     authCredentials.DocumentDBCollectionId);
         }
 
-        public void WriteDocument(DataObjects.Measurement measurement)
+        public  async void WriteDocument(DataObjects.Measurement measurement)
         {
-            client.CreateDocumentAsync(collectionUri, measurement);
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            var response = await client.CreateDocumentAsync(collectionUri, measurement);
+            s.Stop();
+            Log.Debug($"Created document for {measurement.Name}; Time elapsed: {s.Elapsed}; Request charge: {response.RequestCharge}");
         }
 
         /// <summary>
@@ -42,18 +52,23 @@ namespace TempyAPI
         public DataObjects.TemperatureMeasurement GetLatestMeasurementByName(string name,
             int measurementType = 0)
         {
+            Stopwatch s = new Stopwatch();
+            s.Start();
             var queryOptions = new FeedOptions {MaxItemCount = 1};
 
             var sql =
                 $"SELECT TOP 1 * FROM TemperatureMeasurements WHERE TemperatureMeasurements.Name = '{name}'  and TemperatureMeasurements.Type = {measurementType} ORDER BY TemperatureMeasurements.UnixTimestamp DESC";
             var measurementsQuery = client.CreateDocumentQuery<DataObjects.TemperatureMeasurement>(
                 collectionUri, sql, queryOptions).AsEnumerable().FirstOrDefault();
-
+            s.Stop();
+            Log.Debug($"GetLatestMeasurementByName({name},{measurementType}) returned in {s.Elapsed}");
             return measurementsQuery;
         }
 
         public List<string> GetNames()
         {
+            Stopwatch s = new Stopwatch();
+            s.Start();
             var queryOptions = new FeedOptions {MaxItemCount = -1};
             var sql = "SELECT distinct TemperatureMeasurements.Name FROM TemperatureMeasurements";
             IQueryable<dynamic> measurementsQuery =
@@ -64,7 +79,9 @@ namespace TempyAPI
                 names.Add(v.Name);
             }
 
-           
+            //var offer = client.ReadOfferAsync().Result;
+           s.Stop();
+            Log.Debug($"Time elapsed in GetNames() is {s.Elapsed}");
             return names;
         }
 
