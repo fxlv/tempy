@@ -68,12 +68,9 @@ namespace TempyAPI.Controllers
         [HttpGet("{name}")]
         public JsonResult GetLastMeasurement(string name)
         {
-            var db = new TempyDB(_cosmosDbAuthSettings);
-            var result = db.GetLatestMeasurementByName(name);
+            var jsonResult = GetLastMeasurementType(name, 0);
             Program.LogHttpRequest(Request.Method, Response.StatusCode.ToString(),
-                HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());
-            var jsonResult = new JsonResult(result);
-            
+                HttpContext.Connection.RemoteIpAddress.ToString(), HttpContext.Request.Path.ToString());       
             return jsonResult;
         }
         
