@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
@@ -174,29 +174,21 @@ namespace TempyWorker
             }
         }
 
-        public bool PostMeasurement(string tempyApiTarget, DataObjects.Measurement measurement)
+        public void PostMeasurement(string tempyApiTarget, DataObjects.Measurement measurement)
         {
+            var sw = new Stopwatch();
+            sw.Start();
             var client = new RestClient();
             client.BaseUrl = new Uri($"http://{tempyApiTarget}/");
             var request = new RestRequest("api/measurements", Method.POST);
             request.RequestFormat = DataFormat.Json;
             var json = JsonConvert.SerializeObject(measurement);
-            Log.Debug($"Posting measurement to {tempyApiTarget}");
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json; charset=utf-8", json, ParameterType.RequestBody);
             // todo: make the execute async
             var response = client.Execute(request);
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                Log.Debug($"Post OK");
-                return true;
-            }
-            else
-            {
-                Log.Warning($"Post FAILED");
-                return false;
-
-            }            
+            sw.Stop();
+            Log.Debug($"PostMeasurement '{measurement.Name}' to {tempyApiTarget}, response: {response.StatusCode.ToString()} took {sw.Elapsed}");
         }
     }
 }
