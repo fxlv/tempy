@@ -1,7 +1,9 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using NetatmoLib;
 using Newtonsoft.Json;
@@ -71,7 +73,7 @@ namespace TempyWorker
                 Thread.Sleep(sleepSeconds);
             }
         }
-        public async void WorkerRun(RunnerConfig runnerConfig)
+        public void WorkerRun(RunnerConfig runnerConfig)
         {
             // do netatmo auth
             // initializes netatmolib
@@ -90,19 +92,31 @@ namespace TempyWorker
 
             try
             {
+                var swNetatmo = new Stopwatch();
+                swNetatmo.Start();
                 var devices = NetatmoQueries.GetTempAsync(auth.GetToken()).GetAwaiter().GetResult();
+                swNetatmo.Stop();
+                Log.Debug($"Received results from netatmo in {swNetatmo.Elapsed}");
+                // create a list of tasks
+                List<Task> measurementsList = new List<Task>();
+                
                 foreach (var device in devices)
                     if (DateTimeOps.IsDataFresh(device.last_status_store))
                     {
-                        PostMeasurement(runnerConfig.TempyApiTarget,
-                            AssembleMeasurement(device, DataObjects.MeasurementType.Temperature));
-                        PostMeasurement(runnerConfig.TempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.Humidity));
-                        PostMeasurement(runnerConfig.TempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.CO2));
+                        measurementsList.Add(PostMeasurement(runnerConfig.TempyApiTarget,
+                            AssembleMeasurement(device, DataObjects.MeasurementType.Temperature)));
+
+                        measurementsList.Add(PostMeasurement(runnerConfig.TempyApiTarget,
+                            AssembleMeasurement(device, DataObjects.MeasurementType.Humidity)));
+                        measurementsList.Add(PostMeasurement(runnerConfig.TempyApiTarget, AssembleMeasurement(device, DataObjects.MeasurementType.CO2)));
                     }
                     else
                     {
                         Log.Warning($"Data from device: {device} is more than 20 minutes old. Skipping.");
                     }
+                Log.Debug("List of tasks created.");
+                Task.WhenAll(measurementsList);
+
             }
             catch (Exception e)
             {
@@ -174,19 +188,20 @@ namespace TempyWorker
             }
         }
 
-        public void PostMeasurement(string tempyApiTarget, DataObjects.Measurement measurement)
+        public async Task PostMeasurement(string tempyApiTarget, DataObjects.Measurement measurement)
         {
             var sw = new Stopwatch();
             sw.Start();
             var client = new RestClient();
             client.BaseUrl = new Uri($"http://{tempyApiTarget}/");
             var request = new RestRequest("api/measurements", Method.POST);
+            
             request.RequestFormat = DataFormat.Json;
             var json = JsonConvert.SerializeObject(measurement);
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json; charset=utf-8", json, ParameterType.RequestBody);
             // todo: make the execute async
-            var response = client.Execute(request);
+            var response = await client.ExecuteTaskAsync(request);
             sw.Stop();
             Log.Debug($"PostMeasurement '{measurement.Name}' to {tempyApiTarget}, response: {response.StatusCode.ToString()} took {sw.Elapsed}");
         }
