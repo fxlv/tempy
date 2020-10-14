@@ -9,6 +9,7 @@ using Serilog;
 using Serilog.Events;
 using System.Configuration;
 using System.Linq;
+using System.Net;
 using Serilog.Sinks.SystemConsole.Themes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Binder;
@@ -20,6 +21,8 @@ namespace NetatmoCLI
     {
         [Option('l', "loop", Required = false, HelpText = "Refresh temperature data continuously in a loop.")]
         public bool Loop { get; set; }
+        [Option('k',"keyvalue", Required = false, HelpText = "Machine readable key=value output.")]
+        public bool KeyValue { get; set; }
     }
 
     
@@ -70,38 +73,85 @@ namespace NetatmoCLI
                     Console.Clear();
                     Console.WriteLine("Updating data in a loop...");
                     Console.Out.Flush();
-                    await DisplayTemp(netAuth);
+                    await DisplayTemp(netAuth, false);
                     Thread.Sleep(5000);
                 }
             }
 
-            await DisplayTemp(netAuth);
+            await DisplayTemp(netAuth, options.KeyValue);
             Log.CloseAndFlush();
         }
 
 
         /// <summary>
+        /// Display temperature of one sensor/module
+        /// </summary>
+
+        public static void DisplaySensor(string sensorName, float temperature)
+        {
+            Console.WriteLine($" Sensor: {sensorName}, Temperature: {temperature}");
+        }
+        
+        public static void DisplaySensorAsKv(string sensorName, float temperature)
+        {
+            Console.WriteLine($"{sensorName}={temperature}");
+        }
+
+
+
+        public static void DisplayDevice(Device device)
+        {
+            DisplayDevice(device, false);
+        }
+        
+        /// <summary>
         /// Display status of one device.
         /// </summary>
-        public static void DisplayDevice(Device device)
+        public static void DisplayDevice(Device device, bool keyvalue)
         {
             //todo: check last updated time for all modules, not just the base station
             // as it is quite possible that a module has been disconnected and this should be clearly
             // stated in such case
             var lastUpdateString = DateTimeOps.GetLastUpdateString(device.last_status_store);
-            Console.WriteLine($"{device.station_name} (updated {lastUpdateString} ago)");
-            Console.WriteLine(
-                $" Sensor: {device.module_name}, temperature: {device.dashboard_data.Temperature}");
+            
+            if (!keyvalue)
+            {
+                Console.WriteLine($"{device.station_name} (updated {lastUpdateString} ago)");
+
+            }
+
+
+            if (keyvalue)
+            {
+                DisplaySensorAsKv(device.module_name, (float) device.dashboard_data.Temperature);
+
+            }
+            else
+            {
+                DisplaySensor(device.module_name, (float) device.dashboard_data.Temperature);
+
+            }
             foreach (var module in device.modules)
             {
                 if (module.reachable)
                 {
-                    Console.WriteLine(
-                        $" Sensor: {module.module_name}, Temperature: {module.dashboard_data.Temperature}");
+                    if (keyvalue)
+                    {
+                        DisplaySensorAsKv(module.module_name, (float) module.dashboard_data.Temperature);
+
+                    }
+                    else
+                    {
+                        DisplaySensor(module.module_name, (float) module.dashboard_data.Temperature);
+
+                    }
                 }
                 else
                 {
-                    Console.WriteLine($" Sensor: {module.module_name} is unreachable.");
+                    if (keyvalue)
+                    {
+                        Console.WriteLine($" Sensor: {module.module_name} is unreachable.");
+                    }
                 }
             }
                 
@@ -110,22 +160,36 @@ namespace NetatmoCLI
         /// <summary>
         ///     Display temperature data on the CLI.
         /// </summary>
-        public static async Task DisplayTemp(NetatmoAuth netAuth)
+        public static async Task DisplayTemp(NetatmoAuth netAuth, bool keyvalue)
         {
             var netatmoDevices = await NetatmoQueries.GetTempAsync(netAuth.GetToken());
+            if (keyvalue)
+            {
+                foreach (var device in netatmoDevices)
+                    if (DateTimeOps.IsDataFresh(device.last_status_store))
+                    {
+                        DisplayDevice(device, keyvalue);
+                    }
+                 
 
-            Console.WriteLine(new string('-', 60));
-            foreach (var device in netatmoDevices)
-                if (DateTimeOps.IsDataFresh(device.last_status_store))
-                {
-                    DisplayDevice(device);
-                }
-                else
-                {
-                    Console.WriteLine($"Data from device: {device.station_name} is more than 20 minutes old.");
-                }
+                Console.Out.Flush();
+            }
+            else
+            {
+                Console.WriteLine(new string('-', 60));
+                foreach (var device in netatmoDevices)
+                    if (DateTimeOps.IsDataFresh(device.last_status_store))
+                    {
+                        DisplayDevice(device);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Data from device: {device.station_name} is more than 20 minutes old.");
+                    }
 
-            Console.Out.Flush();
+                Console.Out.Flush();
+            }
+            
         }
     }
 }
