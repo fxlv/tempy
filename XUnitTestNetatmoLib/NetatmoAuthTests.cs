@@ -27,6 +27,11 @@ namespace XUnitTestNetatmoLib
             var tempyConfiguration = new Configuration(configFileDirectory);
             var configuration = tempyConfiguration.GetConfigurationRoot();
             var netatmoCreds = tempyConfiguration.GetNetatmoApiAuthCredentials();
+            if (netatmoCreds.Password == "password")
+            {
+                // default password, there is no point to even try to authenticate
+                return;
+            } 
             var auth = new NetatmoAuth(netatmoCreds);
             // assert that the auth token is not null
             Assert.True(auth.GetToken() != null);
