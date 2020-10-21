@@ -23,6 +23,7 @@ namespace TempyAPI
             var cosmosDbAuthSettings = new TempyDbAuthCredentials();
             Configuration.Bind("CosmosDbAuthSettings", cosmosDbAuthSettings);
             services.AddSingleton(cosmosDbAuthSettings);
+            services.AddMvc(option => option.EnableEndpointRouting = false);
             // add a policy to allow CORS requests from any origins, 
             // this will be used for remote Javascript to fetch TempyAPI data
             services.AddCors(
