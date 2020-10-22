@@ -19,11 +19,11 @@ namespace TempyAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             var cosmosDbAuthSettings = new TempyDbAuthCredentials();
             Configuration.Bind("CosmosDbAuthSettings", cosmosDbAuthSettings);
             services.AddSingleton(cosmosDbAuthSettings);
-            services.AddMvc(option => option.EnableEndpointRouting = false);
+            //services.AddMvc(option => option.EnableEndpointRouting = false);
             // add a policy to allow CORS requests from any origins, 
             // this will be used for remote Javascript to fetch TempyAPI data
             services.AddCors(
