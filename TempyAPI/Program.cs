@@ -18,27 +18,31 @@ namespace TempyAPI
                 TempyConfiguration.Configuration tConfiguration = new TempyConfiguration.Configuration();
                 Logger.Initilize(tConfiguration);
             
-                CreateWebHostBuilder(args).Build().Run();
+
+                CreateWebHostBuilder(tConfiguration.ConfigurationFile).Build().Run();
                 Log.Information("Web server started");
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException e)
             {
+                Console.WriteLine();
                 Console.WriteLine("Could not read the configuration file.");
+                Console.WriteLine(e.Message);
+                Console.WriteLine();
                 Environment.Exit(1);
             }
             
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        public static IWebHostBuilder CreateWebHostBuilder(string configurationFile)
         {
-            return WebHost.CreateDefaultBuilder(args)
+            return WebHost.CreateDefaultBuilder()
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     // Call additional providers here as needed.
                     // Call AddEnvironmentVariables last if you need to allow environment
                     // variables to override values from other providers.
                     config.AddEnvironmentVariables("SETTINGS_");
-                    config.AddJsonFile("appsettings.json");
+                    config.AddJsonFile(configurationFile);
                     
                 })
                 .UseStartup<Startup>()
