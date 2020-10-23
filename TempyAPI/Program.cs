@@ -21,9 +21,12 @@ namespace TempyAPI
                 CreateWebHostBuilder(args).Build().Run();
                 Log.Information("Web server started");
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException e)
             {
+                Console.WriteLine();
                 Console.WriteLine("Could not read the configuration file.");
+                Console.WriteLine(e.Message);
+                Console.WriteLine();
                 Environment.Exit(1);
             }
             

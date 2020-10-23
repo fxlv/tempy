@@ -35,7 +35,7 @@ namespace TempyConfiguration
             string kubernetesConfigFileName = "/config/appsettings.json";
 
 
-            if (File.Exists(kubernetesConfigFileName))
+            if (File.Exists(kubernetesConfigFileName) && Validators.IsValidJsonFile(kubernetesConfigFileName))
             {
                 // running in kubernetes and settings file has been provided via a config map
                 ConfigurationFile = kubernetesConfigFileName;
