@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore;
+﻿using System;
+using System.IO;
+using System.IO.Enumeration;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -10,11 +13,20 @@ namespace TempyAPI
     {
         public static void Main(string[] args)
         {
-            TempyConfiguration.Configuration tConfiguration = new TempyConfiguration.Configuration();
-            Logger.Initilize(tConfiguration);
+            try
+            {
+                TempyConfiguration.Configuration tConfiguration = new TempyConfiguration.Configuration();
+                Logger.Initilize(tConfiguration);
             
-            CreateWebHostBuilder(args).Build().Run();
-            Log.Information("Web server started");
+                CreateWebHostBuilder(args).Build().Run();
+                Log.Information("Web server started");
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Could not read the configuration file.");
+                Environment.Exit(1);
+            }
+            
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
