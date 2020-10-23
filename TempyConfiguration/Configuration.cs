@@ -18,7 +18,7 @@ namespace TempyConfiguration
             {
                 // unless configuration directory was provided to the constructor,
                 // User the current working directory
-                // support for overriding it exists mosty for use during testing
+                // support for overriding it exists mostly for use during testing
                 ConfigDirectory = Directory.GetCurrentDirectory();
             }
             else
