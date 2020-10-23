@@ -32,8 +32,15 @@ namespace TempyConfiguration
 
             string primaryConfigFileName = Path.Combine(ConfigDirectory, "appsettings.json");
             string secondaryConfigFileName = Path.Combine(ConfigDirectory, "appsettings.json.default");
+            string kubernetesConfigFileName = "/config/appsettings.json";
 
-            if (File.Exists(primaryConfigFileName) && Validators.IsValidJsonFile(primaryConfigFileName))
+
+            if (File.Exists(kubernetesConfigFileName))
+            {
+                // running in kubernetes and settings file has been provided via a config map
+                ConfigurationFile = kubernetesConfigFileName;
+            }
+            else if (File.Exists(primaryConfigFileName) && Validators.IsValidJsonFile(primaryConfigFileName))
             {
                 ConfigurationFile = primaryConfigFileName;
 
