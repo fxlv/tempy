@@ -30,24 +30,21 @@ namespace TempyConfiguration
             // in case the primary configuration file is missing, fall back to using appsettings.json.default
             // if neither are present, throw an exception
 
-            string primaryConfigFileName = Path.Combine(ConfigDirectory, "appsettings.json");
-            string secondaryConfigFileName = Path.Combine(ConfigDirectory, "appsettings.json.default");
-            string kubernetesConfigFileName = "/config/appsettings.json";
-
-
-            if (File.Exists(kubernetesConfigFileName) && Validators.IsValidJsonFile(kubernetesConfigFileName))
+           
+            string configFileName = Path.Combine(ConfigDirectory, "appsettings.json");
+           
+           
+            if (File.Exists(configFileName)) 
             {
-                // running in kubernetes and settings file has been provided via a config map
-                ConfigurationFile = kubernetesConfigFileName;
-            }
-            else if (File.Exists(primaryConfigFileName) && Validators.IsValidJsonFile(primaryConfigFileName))
-            {
-                ConfigurationFile = primaryConfigFileName;
+                if (Validators.IsValidJsonFile(configFileName))
+                {
+                    ConfigurationFile = configFileName;
+                }
+                else
+                {
+                    Console.WriteLine("ERROR: Configuration file exists but is not valid.");
 
-            }
-            else if (File.Exists(secondaryConfigFileName) && Validators.IsValidJsonFile(secondaryConfigFileName))
-            {
-                ConfigurationFile = secondaryConfigFileName;
+                }
             }
             else
             {

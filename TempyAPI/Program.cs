@@ -26,7 +26,7 @@ namespace TempyAPI
             {
                 Console.WriteLine();
                 Console.WriteLine("Could not read the configuration file.");
-                Console.WriteLine(e.Message);
+                Console.WriteLine($"Exception: {e.Message}");
                 Console.WriteLine();
                 Environment.Exit(1);
             }
