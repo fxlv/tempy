@@ -1,8 +1,7 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1
 MAINTAINER Kaspars Mickevics (kaspars@fx.lv)
-COPY . /tempy
+RUN git clone https://github.com/fxlv/tempy.git
 WORKDIR /tempy
-#RUN ./clean.sh
 RUN dotnet clean
 RUN dotnet restore
 RUN dotnet build
