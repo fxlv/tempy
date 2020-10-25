@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tempy-worker
+spec:
+  containers:
+    - image: fxlvacr.azurecr.io/testing/tempyworker
+      name: tempy-worker
+      volumeMounts:
+        - name: config
+          mountPath: /config
+      ports:
+        - containerPort: 5000
+          name: http
+          protocol: TCP
+  volumes:
+    - name: config
+      configMap:
+        name: tempyapi
+  restartPolicy: OnFailure
