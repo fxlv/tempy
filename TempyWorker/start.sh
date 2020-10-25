@@ -4,9 +4,4 @@ if [ -e /config/appsettings.json ]; then
     cp -v /config/appsettings.json .
 fi
 echo "Tempy API target: $TEMPY_API_TARGET"
-
-
-echo "Going into loop.."
-while true; do sleep 60; done
-# dotnet run
-
+dotnet run
