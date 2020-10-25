@@ -5,7 +5,7 @@ echo
 echo "Building Docker images"
 echo
 sudo docker build -t fxlvacr.azurecr.io/testing/tempybuild -f Dockerfile.build --no-cache .
-sudo docker build -t fxlvacr.azurecr.io/testing/tempyapi -f Dockerfile.build --no-cache .
+sudo docker build -t fxlvacr.azurecr.io/testing/tempyapi -f Dockerfile.API --no-cache .
 sudo docker build -t fxlvacr.azurecr.io/testing/tempyworker -f Dockerfile.Worker --no-cache .
   
 
