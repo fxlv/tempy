@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempy-api
+spec:
+  selector:
+    matchLabels:
+      app: tempy
+      component: api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tempy
+        component: api
+    spec:
+      containers:
+        - image: fxlvacr.azurecr.io/testing/tempyapi
+          name: tempy-api
+          volumeMounts:
+            - name: config
+              mountPath: /config
+          ports:
+            - containerPort: 5000
+              name: http
+              protocol: TCP
+      volumes:
+        - name: config
+          configMap:
+            name: tempyapi

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempy-worker
+spec:
+  selector:
+    matchLabels:
+      app: tempy
+      component: worker
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tempy
+        component: worker
+    spec:
+      containers:
+        - image: fxlvacr.azurecr.io/testing/tempyworker
+          name: tempy-worker
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          configMap:
+            name: tempyworker
