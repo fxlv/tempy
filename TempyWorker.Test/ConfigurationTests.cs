@@ -48,37 +48,7 @@ namespace TempyWorker.Test
             Assert.IsType<string>(netatmoCreds.ClientId);
             Assert.IsType<string>(netatmoCreds.ClientSecret);
         }
-
-        /// <summary>
-        /// Test scenario when the config file appsettings.json is missing.
-        /// In such scenario Tempy should fall back to using appsettings.json.default
-        /// </summary>
-        [Fact]
-        public void FallBackToDefaultConfigFile_when_config_missing()
-        {
-            string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "default_missing")); 
-            TempyConfiguration = new Configuration(configFileDirectory);
-            // get the currently used config file base name
-            var configBaseName = Path.GetFileName(TempyConfiguration.ConfigurationFile); 
-            // assert we have fallen back to using the default config file
-            Assert.True(configBaseName == "appsettings.json.default"); 
-                
-        }
         
-        /// <summary>
-        /// Test a scenario when appsettings.json file is invalid. For example when it is encrypted or malformed.
-        /// In such scenario Tempy should fall back to using appsettings.json.default
-        /// </summary>
-        [Fact]
-        public void FallBackToDefaultConfigFile_when_config_corrupted()
-        {
-            string configFileDirectory = Path.GetFullPath(Path.Combine(testFilesDir, "default_corrupted")); 
-            TempyConfiguration = new Configuration(configFileDirectory);
-            // get the currently used config file base name
-            var configBaseName = Path.GetFileName(TempyConfiguration.ConfigurationFile); 
-            // assert we have fallen back to using the default config file
-            Assert.True(configBaseName == "appsettings.json.default"); 
-        }
         
         /// <summary>
         /// If neither appsettings.json or appsettings.json.default can be found, we throw in the towel.
