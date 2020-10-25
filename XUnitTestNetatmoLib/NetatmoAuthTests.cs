@@ -14,7 +14,7 @@ namespace XUnitTestNetatmoLib
         /// <summary>
         /// The auth token cannot be null. 
         /// </summary>
-        [Fact]
+        [Fact (Skip = "needs authentication token to work")]
         public void NetatmoAuthReturnsNonNullAuthToken()
         {
             // todo: this is really not the best place for this test, still it does provides value
