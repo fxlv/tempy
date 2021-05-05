@@ -92,9 +92,9 @@ namespace NetatmoCLI
             Console.WriteLine($" Sensor: {sensorName}, Temperature: {temperature}");
         }
         
-        public static void DisplaySensorAsKv(string sensorName, float temperature)
+        public static void DisplaySensorAsKv(string stationName, string sensorName, float temperature)
         {
-            Console.WriteLine($"{sensorName}={temperature}");
+            Console.WriteLine($"{stationName}:{sensorName}={temperature}");
         }
 
 
@@ -123,7 +123,7 @@ namespace NetatmoCLI
 
             if (keyvalue)
             {
-                DisplaySensorAsKv(device.module_name, (float) device.dashboard_data.Temperature);
+                DisplaySensorAsKv(device.station_name, device.module_name, (float) device.dashboard_data.Temperature);
 
             }
             else
@@ -137,7 +137,7 @@ namespace NetatmoCLI
                 {
                     if (keyvalue)
                     {
-                        DisplaySensorAsKv(module.module_name, (float) module.dashboard_data.Temperature);
+                        DisplaySensorAsKv(device.station_name,module.module_name, (float) module.dashboard_data.Temperature);
 
                     }
                     else
