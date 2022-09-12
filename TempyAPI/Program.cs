@@ -46,7 +46,7 @@ namespace TempyAPI
                     
                 })
                 .UseStartup<Startup>()
-                .UseUrls("http://*:5000");
+                .UseUrls("http://*:5001");
            
         }
         
